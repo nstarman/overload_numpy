@@ -1,6 +1,0 @@
-[flake8]
-max-line-length = 120
-ignore = E203, W503
-per-file-ignores =
-    src/overload_numpy/*.pyi:E301,E302,E305,E704
-doctests = True

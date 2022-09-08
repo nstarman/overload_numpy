@@ -1,9 +1,10 @@
-# Overload ``NumPy`` functions
+Overload ``NumPy`` functions
+############################
 
 Tools for implementing ``__numpy_function__`` on custom functions.
 
-Worked Example
---------------
+Quick Worked Example
+--------------------
 
 This is a simple example.
 
@@ -40,3 +41,9 @@ Time to check this works:
     Vector1D(x=array([0, 1, 2, 0, 1, 2]))
 
 Great. Your turn!
+
+
+Details
+-------
+
+See the Docs.
