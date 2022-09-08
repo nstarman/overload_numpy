@@ -123,7 +123,7 @@ class NumPyOverloader(Mapping[Callable[..., Any], _Dispatcher]):
         /,
         dispatch_on: type,
         *,
-        types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
+        types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
     ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """Register an __array_function__ implementation object.
 
@@ -138,9 +138,12 @@ class NumPyOverloader(Mapping[Callable[..., Any], _Dispatcher]):
         dispatch_on : type
             The class type for which the overload implementation is being
             registered.
-        types : type or TypeConstraint or Collection thereof or None, keyword-only
-            The types of the arguments of `numpy_func`.
-            If `None` then ``dispatch_on`` must have class-level attribute ``NP_FUNC_TYPES``
+        types : type or TypeConstraint or Collection thereof or None,
+        keyword-only
+            The types of the arguments of `numpy_func`. See
+            https://numpy.org/doc/stable/reference/arrays.classes.html#numpy.class.__array_function__
+            If `None` then ``dispatch_on`` must have class-level attribute
+            ``NP_FUNC_TYPES`` specifying the types.
 
         Returns
         -------

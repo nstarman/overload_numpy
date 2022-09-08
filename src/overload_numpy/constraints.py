@@ -107,7 +107,7 @@ class Covariant(TypeConstraint):
     --------
     Construct the constraint object:
 
-        >>> constraint = Invariant(int)
+        >>> constraint = Covariant(int)
 
     This can be used to validate argument types:
 
@@ -141,7 +141,7 @@ class Contravariant(TypeConstraint):
     --------
     Construct the constraint object:
 
-        >>> constraint = Invariant(int)
+        >>> constraint = Contravariant(int)
 
     This can be used to validate argument types:
 
@@ -183,7 +183,7 @@ class Between(TypeConstraint):
 
     Construct the constraint object:
 
-        >>> constraint = Invariant((D, B))
+        >>> constraint = Between((D, B))
 
     This can be used to validate argument types:
 
