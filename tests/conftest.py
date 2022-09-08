@@ -18,10 +18,8 @@ import pytest
 ASTROPY_HEADER: bool
 try:
     # THIRD PARTY
-    from pytest_astropy_header.display import (
-        PYTEST_HEADER_MODULES,  # type: ignore
-        TESTED_VERSIONS,  # type: ignore
-    )
+    from pytest_astropy_header.display import PYTEST_HEADER_MODULES  # type: ignore
+    from pytest_astropy_header.display import TESTED_VERSIONS  # type: ignore
 
     ASTROPY_HEADER = True
 except ImportError:
