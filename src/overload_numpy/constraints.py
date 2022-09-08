@@ -183,7 +183,7 @@ class Between(TypeConstraint):
 
     Construct the constraint object:
 
-        >>> constraint = Between((D, B))
+        >>> constraint = Between(D, B)
 
     This can be used to validate argument types:
 
