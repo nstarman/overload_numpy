@@ -1,11 +1,11 @@
 [project]
   name = "overload_numpy"
   version = "0.0.1"
-  description = "Stellar Stream Tracker"
+  description = "Overload NumPy Functions"
   readme = "README.rst"
   requires-python = ">=3.8"
-  license = {file = "licenses/LICENSE.rst"}
-  keywords = ["stellar streams", "astronomy"]
+  license = {file = "LICENSE"}
+  keywords = ["numpy", "interoperability"]
   authors = [
     {name = "Nathaniel Starkman", email = "n.starkman@mail.utoronto.ca"}
   ]
@@ -14,11 +14,10 @@
   ]
   classifiers = [
     "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Topic :: Scientific/Engineering :: Astronomy",
-    "Topic :: Scientific/Engineering :: Physics",
   ]
   dependencies = [
     "mypy",
@@ -56,7 +55,6 @@
     "mypy",
     "setuptools>=45",
     "setuptools_scm>=6.2",
-    "oldest-supported-numpy",
     "wheel",
   ]
 

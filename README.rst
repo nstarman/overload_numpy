@@ -27,7 +27,7 @@ The overloads apply to an array wrapping class. Let's define one:
     ...     x: np.ndarray
     ...     NP_FUNC_OVERLOADS: ClassVar[NumPyOverloader] = VEC_FUNCS
 
-Now :mod:`numpy` functions can be overloaded and registered for ``Vector1D``.
+Now ``numpy`` functions can be overloaded and registered for ``Vector1D``.
 
     >>> @VEC_FUNCS.implements(np.concatenate, Vector1D)
     ... def concatenate(vec1ds: tuple[Vector1D, ...]) -> Vector1D:
