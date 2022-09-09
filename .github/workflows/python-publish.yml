@@ -33,7 +33,7 @@ jobs:
 
       - name: Upload to PyPI via Twine
         env:
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: twine upload --verbose -u '__token__' dist/*
 
   mypyc:
@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload wheels to PyPI via Twine
         env:
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: pipx run twine upload --verbose -u '__token__' wheelhouse/*.whl
 
   update-stable-branch:
