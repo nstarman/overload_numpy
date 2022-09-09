@@ -1,0 +1,7 @@
+mypy >= 0.971
+mypy-extensions >= 0.4.3
+
+# And because build isolation is disabled, we'll need to pull this too
+setuptools-scm[toml] >= 6.3.1
+typing-extensions > 3.10.0.1
+wheel
