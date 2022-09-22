@@ -38,6 +38,7 @@
     "IPython",
     "jupyter_client",
     "nbsphinx",
+    "pydata-sphinx-theme",
     "sphinx",
     "sphinx-astropy",
     "sphinxcontrib.bibtex < 2.0.0",
@@ -174,7 +175,7 @@
 
 
 [tool.pytest.ini_options]
-  testpaths = ["src/overload_numpy", "docs"]
+  testpaths = ["tests", "src/overload_numpy", "docs"]
   astropy_header = "True"
   doctest_plus = "enabled"
   text_file_format = "rst"
