@@ -8,10 +8,10 @@ from collections.abc import Collection
 from dataclasses import dataclass
 from typing import Any, Callable, ClassVar, TypeVar, final
 
-# THIRD PARTY
+# THIRDPARTY
 from mypy_extensions import mypyc_attr
 
-# LOCAL
+# LOCALFOLDER
 from overload_numpy.constraints import TypeConstraint
 
 __all__: list[str] = []

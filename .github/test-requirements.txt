@@ -1,0 +1,9 @@
+# TODO! figure out how to source from [project.optional-dependencies]
+coverage[toml]
+hypothesis
+numpy>=1.18
+pytest>=6.1.1
+pytest-astropy-header
+pytest-cov
+pytest-doctestplus
+typing_extensions>=4.2

@@ -1,9 +1,9 @@
 """Unit tests for :mod:`overload_numpy.overload`."""
 
-# THIRD PARTY
+# THIRDPARTY
 import pytest
 
-# LOCAL
+# LOCALFOLDER
 from overload_numpy.overload import NumPyOverloader
 
 

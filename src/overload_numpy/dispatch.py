@@ -7,7 +7,7 @@ from __future__ import annotations
 from functools import singledispatch
 from typing import TYPE_CHECKING, Any, NoReturn, final
 
-# LOCAL
+# LOCALFOLDER
 from overload_numpy.npinfo import _NOT_DISPATCHED, _NumPyInfo
 
 if TYPE_CHECKING:

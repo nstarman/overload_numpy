@@ -13,14 +13,13 @@ from __future__ import annotations
 import os
 from typing import Any
 
-# THIRD PARTY
+# THIRDPARTY
 import pytest
 
 ASTROPY_HEADER: bool
 try:
-    # THIRD PARTY
-    from pytest_astropy_header.display import PYTEST_HEADER_MODULES  # type: ignore
-    from pytest_astropy_header.display import TESTED_VERSIONS  # type: ignore
+    # THIRDPARTY
+    from pytest_astropy_header.display import PYTEST_HEADER_MODULES, TESTED_VERSIONS
 
     ASTROPY_HEADER = True
 except ImportError:
@@ -63,7 +62,7 @@ def add_numpy(doctest_namespace: dict[str, Any]) -> None:
     doctest_namespace : namespace
 
     """
-    # THIRD PARTY
+    # THIRDPARTY
     import numpy
 
     # add to namespace

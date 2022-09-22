@@ -7,14 +7,10 @@ from __future__ import annotations
 from collections.abc import Collection
 from typing import Any, Callable, Final, Iterator, KeysView, Mapping, ValuesView
 
-# LOCAL
+# LOCALFOLDER
 from overload_numpy.constraints import Covariant, TypeConstraint
 from overload_numpy.dispatch import _Dispatcher
 from overload_numpy.npinfo import _NumPyInfo
-
-# if TYPE_CHECKING:
-#     # THIRD PARTY
-#     from typing_extensions import TypeGuard
 
 __all__: list[str] = []
 

@@ -6,11 +6,11 @@ from __future__ import annotations
 # STDLIB
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Collection
 
-# THIRD PARTY
+# THIRDPARTY
 from mypy_extensions import mypyc_attr
 
 if TYPE_CHECKING:
-    # LOCAL
+    # LOCALFOLDER
     from overload_numpy.constraints import TypeConstraint
     from overload_numpy.overload import NumPyOverloader
 

@@ -7,7 +7,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 
-# THIRD PARTY
+# THIRDPARTY
 from mypy_extensions import mypyc_attr
 
 __all__ = ["TypeConstraint", "Invariant", "Covariant", "Contravariant", "Between"]

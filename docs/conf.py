@@ -9,7 +9,7 @@ import sys
 from importlib import import_module
 from importlib.metadata import version as get_version
 
-# THIRD PARTY
+# THIRDPARTY
 import tomli
 
 

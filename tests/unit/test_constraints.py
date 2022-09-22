@@ -6,10 +6,10 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from typing import Protocol
 
-# THIRD PARTY
+# THIRDPARTY
 import pytest
 
-# LOCAL
+# LOCALFOLDER
 from overload_numpy.constraints import (
     Between,
     Contravariant,

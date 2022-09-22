@@ -8,6 +8,9 @@ on:
     - '*'
   pull_request:
 
+permissions:
+  contents: read
+
 env:
   ARCH_ON_CI: "normal"
   IS_CRON: "false"
@@ -35,6 +38,7 @@ jobs:
             core.info(`PR opened correctly against ${allowed_basebranch}`);
           }
 
+
   tests:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -43,13 +47,6 @@ jobs:
       fail-fast: true
       matrix:
         include:
-
-          # Run faster by the pre-commit bot
-          # - name: Code style checks
-          #   os: ubuntu-latest
-          #   python: 3.x
-          #   toxenv: codestyle
-          #   toxposargs: --all-files -v
 
           # NOTE: this coverage test is needed for tests and code that
           #       run only with minimal dependencies.
@@ -110,4 +107,44 @@ jobs:
         file: ./coverage.xml
 
 
-# TODO! a mypyc compiled test
+  test_pure_wheel_building:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
+    if: (github.event_name == 'push' || github.event_name == 'pull_request')
+    needs: initial_checks
+    with:
+      upload_to_pypi: false
+      upload_to_anaconda: false
+      # FIXME! run tests
+      # test_extras: test
+      # test_command: pytest --pyargs src/numpy_overload
+
+  test_wheel_building:
+    # This ensures that a couple of targets work fine in pull requests and pushes
+    # FIXME! use OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@v1
+    name: mypyc wheels (${{ matrix.name }})
+    if: (github.event_name == 'push' || github.event_name == 'pull_request')
+    needs: initial_checks
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux-x86_64
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build wheels via cibuildwheel
+        uses: pypa/cibuildwheel@v2.10.0
+        env:
+          CIBW_ARCHS_MACOS: "${{ matrix.macos_arch }}"
+          # This isn't supported in pyproject.toml which makes sense (but is annoying).
+          CIBW_PROJECT_REQUIRES_PYTHON: ">=3.8"
+
+      - name: Upload wheels as workflow artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}-mypyc-wheels
+          path: ./wheelhouse/*.whl
