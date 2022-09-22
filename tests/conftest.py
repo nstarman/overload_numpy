@@ -11,6 +11,7 @@ from __future__ import annotations
 
 # STDLIB
 import os
+from typing import Any
 
 # THIRD PARTY
 import pytest
@@ -51,3 +52,19 @@ def pytest_configure(config: pytest.Config) -> None:
 
     packagename = os.path.basename(os.path.dirname(__file__))
     TESTED_VERSIONS[packagename] = version("overload_numpy")
+
+
+@pytest.fixture(autouse=True)  # type: ignore
+def add_numpy(doctest_namespace: dict[str, Any]) -> None:
+    """Add NumPy to Pytest.
+
+    Parameters
+    ----------
+    doctest_namespace : namespace
+
+    """
+    # THIRD PARTY
+    import numpy
+
+    # add to namespace
+    doctest_namespace["np"] = numpy
