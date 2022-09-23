@@ -6,6 +6,7 @@ from __future__ import annotations
 # STDLIB
 from collections.abc import Collection
 from dataclasses import dataclass
+from inspect import isclass
 from typing import Any, Callable, ClassVar, TypeVar, final
 
 # THIRDPARTY
@@ -79,6 +80,9 @@ class _NumPyInfo:
     :todo: py3.10+ add NotImplemented
     """
 
+    dispatch_on: type
+    """The type dispatched on. See ``_Dispatcher``."""
+
     def __post_init__(self) -> None:
         # Validate
         if not callable(self.func):
@@ -89,6 +93,8 @@ class _NumPyInfo:
             isinstance(self.types, Collection) and all(isinstance(t, TypeConstraint) for t in self.types)
         ):
             raise TypeError(f"types must be a TypeConstraint, or collection thereof, not {self.types}")
+        elif not isclass(self.dispatch_on):
+            raise TypeError(f"dispatch_on must be a type, not {self.dispatch_on}")
 
     def validate_types(self, types: Collection[type]) -> bool:
         """Check the types of the arguments.

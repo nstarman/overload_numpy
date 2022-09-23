@@ -182,7 +182,7 @@ class NumPyOverloader(Mapping[Callable[..., Any], _Dispatcher]):
             # ``relevant_args``.
 
             # Adding a new numpy function
-            info = _NumPyInfo(func=func, types=tinfo, implements=numpy_func)
+            info = _NumPyInfo(func=func, types=tinfo, implements=numpy_func, dispatch_on=dispatch_on)
             # Register the function
             self._reg[numpy_func]._dispatcher.register(dispatch_type, info)
             return func

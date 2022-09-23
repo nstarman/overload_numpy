@@ -29,7 +29,9 @@ def _notdispatched(*args: Any, **kwarg: Any) -> NoReturn:
     raise NotImplementedError("not dispatched")
 
 
-_notdispatched_info = _NumPyInfo(func=_notdispatched, implements=_notdispatched, types=_NOT_DISPATCHED)
+_notdispatched_info = _NumPyInfo(
+    func=_notdispatched, implements=_notdispatched, types=_NOT_DISPATCHED, dispatch_on=object
+)
 # The not-dispatched `_NumPyInfo`. All `_Dispatcher` start with this as the base
 # `_NumPyInfo`.
 
