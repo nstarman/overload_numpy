@@ -8,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-# THIRD PARTY
+# THIRDPARTY
 from mypyc.build import mypycify
 from setuptools import setup
 
@@ -71,8 +71,6 @@ else:
     blocklist = [
         # TODO!
         "overload_numpy/dispatch.py",  # https://github.com/python/mypy/issues/13613
-        # Never compiled
-        # "overload_numpy/conftest.py",  # test configuration
     ]
     discovered: list[Path] = []
     discovered.extend(find_python_files(SRC / "overload_numpy"))

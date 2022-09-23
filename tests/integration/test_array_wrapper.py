@@ -7,17 +7,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable
 
-# THIRD PARTY
+# THIRDPARTY
 import numpy as np
 import pytest
 
-# LOCAL
+# LOCALFOLDER
 from overload_numpy import NumPyOverloader
 from overload_numpy.constraints import Covariant
 from overload_numpy.dispatch import _notdispatched_info
 
 if TYPE_CHECKING:
-    # THIRD PARTY
+    # THIRDPARTY
     from typing_extensions import Self
 
 

@@ -7,11 +7,11 @@ from __future__ import annotations
 from numbers import Complex, Rational, Real
 from typing import TYPE_CHECKING, Callable
 
-# THIRD PARTY
+# THIRDPARTY
 import numpy as np
 import pytest
 
-# LOCAL
+# LOCALFOLDER
 from overload_numpy.constraints import Covariant, Invariant
 from overload_numpy.npinfo import _NOT_DISPATCHED, _NumPyInfo
 

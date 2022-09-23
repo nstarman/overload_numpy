@@ -20,8 +20,6 @@
     "Programming Language :: Python :: 3",
   ]
   dependencies = [
-    "mypy",
-    "typing_extensions>=4.2",
     "mypy_extensions>=0.4.3",
   ]
 
@@ -32,6 +30,7 @@
     "numpy>=1.18",
     "pytest",
     "pytest-astropy",
+    "typing_extensions>=4.2",
   ]
   docs = [
     "graphviz",
@@ -79,14 +78,15 @@
   # This is the bare minimum needed to run the test suite. Pulling in the full
   # test_requirements.txt would download a bunch of other packages not necessary
   # here and would slow down the testing step a fair bit.
-  test-requires = ["pytest>=6.1.1"]
-  test-command = 'pytest {project} -k "not incompatible_with_mypyc"'
+  test-requires = ["pip install -r .github/test-requirements.txt"]
+  test-command = 'pytest {project}/tests {project}/docs -k "not incompatible_with_mypyc"'
   # Skip trying to test arm64 builds on Intel Macs. (so cross-compilation doesn't
   # straight up crash)
   test-skip = ["*-macosx_arm64", "*-macosx_universal2:arm64"]
 
 [tool.cibuildwheel.environment]
-  BLACK_USE_MYPYC = "1"
+  CIBW_BUILD_VERBOSITY = "1"
+  NPOVERLOAD_USE_MYPYC = "1"
   MYPYC_OPT_LEVEL = "3"
   MYPYC_DEBUG_LEVEL = "0"
   # The dependencies required to build wheels with mypyc aren't specified in
@@ -98,11 +98,10 @@
       "pip install -r .github/mypyc-requirements.txt",
       "yum install -y clang",
   ]
-  # Newer images break the builds, not sure why. We'll need to investigate more later.
-  manylinux-x86_64-image = "quay.io/pypa/manylinux2014_x86_64:2021-11-20-f410d11"
 
 [tool.cibuildwheel.linux.environment]
-  BLACK_USE_MYPYC = "1"
+  CIBW_BUILD_VERBOSITY = "1"
+  NPOVERLOAD_USE_MYPYC = "1"
   MYPYC_OPT_LEVEL = "3"
   MYPYC_DEBUG_LEVEL = "0"
   PIP_NO_BUILD_ISOLATION = "no"
@@ -137,17 +136,15 @@
 
 [tool.isort]
   profile = "black"
-  multi_line_output = 3
   include_trailing_comma = "True"
-  force_grid_wrap = 0
   use_parentheses = "True"
   ensure_newline_before_comments = "True"
-  sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
   known_localfolder = "overload_numpy"
   known_third_party = ["numpy", "pytest"]
   import_heading_stdlib = "STDLIB"
-  import_heading_thirdparty = "THIRD PARTY"
-  import_heading_localfolder = "LOCAL"
+  import_heading_firstparty = "FIRSTPARTY"
+  import_heading_thirdparty = "THIRDPARTY"
+  import_heading_localfolder = "LOCALFOLDER"
 
 
 [tool.mypy]

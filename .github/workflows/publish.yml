@@ -1,6 +1,3 @@
-# This workflow will upload a Python Package using Twine when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-
 name: Upload Python Package
 
 on:
@@ -11,34 +8,21 @@ permissions:
   contents: read
 
 jobs:
+
   main:
-    name: sdist + pure wheel
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up latest Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "*"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade --disable-pip-version-check pip
-          python -m pip install --upgrade build twine
-
-      - name: Build wheel and source distributions
-        run: python -m build
-
-      - name: Upload to PyPI via Twine
-        env:
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: twine upload --verbose -u '__token__' dist/*
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
+    with:
+      upload_to_pypi: true
+      upload_to_anaconda: false  # TODO!
+      test_extras: test
+      test_command: ls $GITHUB_WORKSPACE; pytest $GITHUB_WORKSPACE/tests $GITHUB_WORKSPACE/docs
+    secrets:
+      pypi_token: ${{ secrets.PYPI_API_TOKEN }}
 
   mypyc:
     name: mypyc wheels (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
