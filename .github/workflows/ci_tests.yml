@@ -114,9 +114,8 @@ jobs:
     with:
       upload_to_pypi: false
       upload_to_anaconda: false
-      # FIXME! run tests
-      # test_extras: test
-      # test_command: pytest --pyargs src/numpy_overload
+      test_extras: test
+      test_command: ls $GITHUB_WORKSPACE; pytest $GITHUB_WORKSPACE/tests $GITHUB_WORKSPACE/docs
 
   test_wheel_building:
     # This ensures that a couple of targets work fine in pull requests and pushes
@@ -127,11 +126,22 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - os: ubuntu-latest
             name: linux-x86_64
+          - os: windows-2019
+            name: windows-amd64
+          - os: macos-11
+            name: macos-x86_64
+            macos_arch: "x86_64"
+          - os: macos-11
+            name: macos-arm64
+            macos_arch: "arm64"
+          - os: macos-11
+            name: macos-universal2
+            macos_arch: "universal2"
 
     steps:
       - uses: actions/checkout@v3
