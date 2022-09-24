@@ -12,8 +12,9 @@ import numpy as np
 import pytest
 
 # LOCALFOLDER
-from overload_numpy.constraints import Covariant, Invariant
-from overload_numpy.npinfo import _NOT_DISPATCHED, _NumPyInfo
+from .test_constraints import TypeConstraint_TestBase
+from overload_numpy.constraints import Covariant, Invariant, TypeConstraint
+from overload_numpy.npinfo import _NOT_DISPATCHED, _NotDispatched, _NumPyInfo
 
 if TYPE_CHECKING:
     # STDLIB
@@ -21,6 +22,22 @@ if TYPE_CHECKING:
 
 ##############################################################################
 # TESTS
+##############################################################################
+
+
+class Test__NotDispatched(TypeConstraint_TestBase):
+    @pytest.fixture(scope="class")
+    def constraint_cls(self) -> type:
+        return _NotDispatched
+
+    @pytest.fixture(scope="class")
+    def constraint(self, constraint_cls) -> TypeConstraint:
+        return _NOT_DISPATCHED
+
+    def test_validate_type(self, constraint) -> None:
+        assert constraint.validate_type(None) is False
+
+
 ##############################################################################
 
 

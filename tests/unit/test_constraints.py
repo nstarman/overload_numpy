@@ -148,3 +148,8 @@ class Test_Between(TypeConstraint_TestBase):
         assert constraint.validate_type(A) is True
         assert constraint.validate_type(B) is True
         assert constraint.validate_type(C) is False
+
+    def test_bounds(self, constraint, types) -> None:
+        A, B, _ = types
+
+        assert constraint.bounds == (B, A)

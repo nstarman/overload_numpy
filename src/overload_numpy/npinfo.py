@@ -7,7 +7,7 @@ from __future__ import annotations
 from collections.abc import Collection
 from dataclasses import dataclass
 from inspect import isclass
-from typing import Any, Callable, ClassVar, TypeVar, final
+from typing import Any, Callable, TypeVar, final
 
 # THIRDPARTY
 from mypy_extensions import mypyc_attr
@@ -33,23 +33,12 @@ Self = TypeVar("Self")
 class _NotDispatched(TypeConstraint):
     """A TypeConstraint that always validates to `False`.
 
-    This TypeConstraint is necessary since python<3.10 does not support
-    ``NotImplementedType``. When the minimum version is py3.10 then this class
-    should be deprecated in favor of `NotImplemented` as the special flag.
+    .. todo::
+
+        This TypeConstraint is necessary since python<3.10 does not support
+        ``NotImplementedType``. When the minimum version is py3.10 then this class
+        should be deprecated in favor of `NotImplemented` as the special flag.
     """
-
-    _instance: ClassVar[_NotDispatched]
-
-    def __init_subclass__(cls) -> None:
-        raise NotImplementedError("`_NotDispatched` cannot be subclassed")
-
-    def __new__(cls: type[_NotDispatched]) -> _NotDispatched:
-        # Make a singleton
-        if not hasattr(cls, "_instance"):
-            self = super().__new__(cls)
-            cls._instance = self
-
-        return cls._instance
 
     def validate_type(self, arg_type: type) -> bool:
         return False  # never true

@@ -43,7 +43,6 @@ class TypeConstraint(metaclass=ABCMeta):
         bool
             Whether the type is valid.
         """
-        ...
 
 
 @mypyc_attr(allow_interpreted_subclasses=True)
