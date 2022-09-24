@@ -1,7 +1,7 @@
 Overload ``NumPy`` functions
 ############################
 
-Tools for implementing ``__numpy_function__`` on custom functions.
+Tools for implementing ``__array_function__`` on custom functions.
 
 Quick Worked Example
 --------------------
