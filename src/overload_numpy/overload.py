@@ -192,7 +192,7 @@ class OverloadDecoratorBase(metaclass=ABCMeta):
             self.overloader._reg[self.numpy_func] = _Dispatcher()
 
     # @abstractmethod  # TODO: fix when https://github.com/python/mypy/issues/5374 released
-    def _func_hook(self, func: Callable[..., Any]) -> Callable[..., Any]:
+    def func_hook(self, func: Callable[..., Any]) -> Callable[..., Any]:
         raise NotImplementedError
 
     def __call__(self, func: C) -> C:
@@ -215,7 +215,7 @@ class OverloadDecoratorBase(metaclass=ABCMeta):
 
         # Adding a new numpy function
         info = _NumPyInfo(
-            func=self._func_hook(func), types=tinfo, implements=self.numpy_func, dispatch_on=self.dispatch_on
+            func=self.func_hook(func), types=tinfo, implements=self.numpy_func, dispatch_on=self.dispatch_on
         )
         # Register the function
         self.overloader._reg[self.numpy_func]._dispatcher.register(self.dispatch_on, info)
@@ -224,11 +224,11 @@ class OverloadDecoratorBase(metaclass=ABCMeta):
 
 @dataclass(frozen=True)
 class ImplementsDecorator(OverloadDecoratorBase):
-    def _func_hook(self, func: C) -> C:
+    def func_hook(self, func: C) -> C:
         return func
 
 
 @dataclass(frozen=True)
 class AssistsDecorator(OverloadDecoratorBase):
-    def _func_hook(self, func: Callable[..., R]) -> Assists[R]:
+    def func_hook(self, func: Callable[..., R]) -> Assists[R]:
         return Assists(func=func, implements=self.numpy_func, dispatch_on=self.dispatch_on)
