@@ -73,8 +73,12 @@ autoclass_content = "both"
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
 rst_epilog = """
-.. |NumPyOverloader| replace:: :class:`~overload_numpy.NumPyOverloader`
-"""
+.. |TypeConstraint| replace:: :class:`~overload_numpy.constraints.TypeConstraint`
+.. |_Dispatcher| replace:: :class:`~overload_numpy.dispatch._Dispatcher`
+.. |NumPyOverloader| replace:: :class:`~overload_numpy.overload.NumPyOverloader`
+
+.. |__array_function__| replace:: `__array_function__ https://numpy.org/doc/stable/reference/arrays.classes.html#numpy.class.__array_function__`_
+"""  # noqa: E501
 
 # intersphinx
 intersphinx_mapping = {
