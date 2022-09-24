@@ -144,7 +144,7 @@
   import_heading_stdlib = "STDLIB"
   import_heading_firstparty = "FIRSTPARTY"
   import_heading_thirdparty = "THIRDPARTY"
-  import_heading_localfolder = "LOCALFOLDER"
+  import_heading_localfolder = "LOCAL"
 
 
 [tool.mypy]

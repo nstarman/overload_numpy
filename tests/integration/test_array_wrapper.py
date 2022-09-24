@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Callable
 import numpy as np
 import pytest
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy import NumPyOverloader
 from overload_numpy.constraints import Covariant
 from overload_numpy.dispatch import _notdispatched_info

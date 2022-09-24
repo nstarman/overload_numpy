@@ -3,7 +3,7 @@
 # THIRDPARTY
 import pytest
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy.overload import NumPyOverloader
 
 

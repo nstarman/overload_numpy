@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Callable
 import numpy as np
 import pytest
 
-# LOCALFOLDER
+# LOCAL
 from .test_constraints import TypeConstraint_TestBase
 from overload_numpy.constraints import Covariant, Invariant, TypeConstraint
 from overload_numpy.npinfo import _NOT_DISPATCHED, _NotDispatched, _NumPyInfo

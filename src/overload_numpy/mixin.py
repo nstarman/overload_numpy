@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any, Callable, ClassVar, Collection
 from mypy_extensions import mypyc_attr
 
 if TYPE_CHECKING:
-    # LOCALFOLDER
+    # LOCAL
     from overload_numpy.constraints import TypeConstraint
     from overload_numpy.overload import NumPyOverloader
 

@@ -8,7 +8,7 @@ from copy import copy, deepcopy
 # THIRDPARTY
 import pytest
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy.dispatch import _Dispatcher, _notdispatched, _notdispatched_info
 from overload_numpy.npinfo import _NOT_DISPATCHED, _NumPyInfo
 

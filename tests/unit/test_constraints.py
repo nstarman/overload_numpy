@@ -11,7 +11,7 @@ from typing import Protocol
 # THIRDPARTY
 import pytest
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy.constraints import (
     Between,
     Contravariant,

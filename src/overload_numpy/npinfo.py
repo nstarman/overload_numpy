@@ -12,7 +12,7 @@ from typing import Any, Callable, TypeVar, final
 # THIRDPARTY
 from mypy_extensions import mypyc_attr
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy.constraints import TypeConstraint
 
 __all__: list[str] = []
