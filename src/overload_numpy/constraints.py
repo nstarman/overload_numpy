@@ -30,12 +30,12 @@ class TypeConstraint(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def validate_type(self, arg_type: type) -> bool:
+    def validate_type(self, arg_type: type, /) -> bool:
         """Validate the argument type.
 
         Parameters
         ----------
-        arg_type : type
+        arg_type : type, positional-only
             The type of the argument that must fit the type con
 
         Returns
@@ -43,7 +43,6 @@ class TypeConstraint(metaclass=ABCMeta):
         bool
             Whether the type is valid.
         """
-        ...
 
 
 @mypyc_attr(allow_interpreted_subclasses=True)
@@ -76,17 +75,7 @@ class Invariant(TypeConstraint):
 
     bound: type
 
-    def validate_type(self, arg_type: type) -> bool:
-        """Validate argument type given constraint.
-
-        Parameters
-        ----------
-        arg_type : type
-
-        Returns
-        -------
-        bool
-        """
+    def validate_type(self, arg_type: type, /) -> bool:
         return arg_type is self.bound
 
 
@@ -121,7 +110,7 @@ class Covariant(TypeConstraint):
 
     bound: type
 
-    def validate_type(self, arg_type: type) -> bool:
+    def validate_type(self, arg_type: type, /) -> bool:
         return issubclass(arg_type, self.bound)
 
 
@@ -155,7 +144,7 @@ class Contravariant(TypeConstraint):
 
     bound: type
 
-    def validate_type(self, arg_type: type) -> bool:
+    def validate_type(self, arg_type: type, /) -> bool:
         return issubclass(self.bound, arg_type)
 
 
@@ -202,7 +191,7 @@ class Between(TypeConstraint):
     lower_bound: type
     upper_bound: type
 
-    def validate_type(self, arg_type: type) -> bool:
+    def validate_type(self, arg_type: type, /) -> bool:
         return issubclass(self.lower_bound, arg_type) & issubclass(arg_type, self.upper_bound)
 
     @property

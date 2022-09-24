@@ -12,8 +12,9 @@ import numpy as np
 import pytest
 
 # LOCALFOLDER
-from overload_numpy.constraints import Covariant, Invariant
-from overload_numpy.npinfo import _NOT_DISPATCHED, _NumPyInfo
+from .test_constraints import TypeConstraint_TestBase
+from overload_numpy.constraints import Covariant, Invariant, TypeConstraint
+from overload_numpy.npinfo import _NOT_DISPATCHED, _NotDispatched, _NumPyInfo
 
 if TYPE_CHECKING:
     # STDLIB
@@ -21,6 +22,22 @@ if TYPE_CHECKING:
 
 ##############################################################################
 # TESTS
+##############################################################################
+
+
+class Test__NotDispatched(TypeConstraint_TestBase):
+    @pytest.fixture(scope="class")
+    def constraint_cls(self) -> type:
+        return _NotDispatched
+
+    @pytest.fixture(scope="class")
+    def constraint(self, constraint_cls) -> TypeConstraint:
+        return _NOT_DISPATCHED
+
+    def test_validate_type(self, constraint) -> None:
+        assert constraint.validate_type(None) is False
+
+
 ##############################################################################
 
 
@@ -36,7 +53,7 @@ class Test__NumPyInfo:
         return Magnitude
 
     @pytest.fixture(scope="class")
-    def implements_info(self) -> tuple[FunctionType, Callable]:
+    def implements_info(self) -> tuple[Callable, Callable]:
         def add(obj1, obj2):
             return obj1._x + obj2
 
@@ -47,21 +64,25 @@ class Test__NumPyInfo:
         # TypeConstraint
         tinfo = (Covariant(custom_cls), Covariant(Real))
 
-        return _NumPyInfo(*implements_info, tinfo)
+        return _NumPyInfo(*implements_info, tinfo, dispatch_on=object)
 
     # ===============================================================
 
     def test_init_error_func(self):
         with pytest.raises(TypeError, match="func must be callable"):
-            _NumPyInfo(func=None, implements=np.add, types=None)
+            _NumPyInfo(func=None, implements=np.add, types=Invariant(Real), dispatch_on=object)
 
     def test_init_error_implements(self):
         with pytest.raises(TypeError, match="implements must be callable"):
-            _NumPyInfo(func=lambda x: x, implements=None, types=None)
+            _NumPyInfo(func=lambda x: x, implements=None, types=Invariant(Real), dispatch_on=object)
 
     def test_init_error_types(self):
         with pytest.raises(TypeError, match="types"):
-            _NumPyInfo(func=lambda x: x, implements=np.add, types=None)
+            _NumPyInfo(func=lambda x: x, implements=np.add, types=None, dispatch_on=object)
+
+    def test_init_error_dispatch_on(self):
+        with pytest.raises(TypeError, match="dispatch"):
+            _NumPyInfo(func=lambda x: x, implements=np.add, types=Invariant(Real), dispatch_on=None)
 
     def test_init(self, npinfo):
         # The pytest fixture proves it passes.
@@ -71,18 +92,18 @@ class Test__NumPyInfo:
 
     @pytest.mark.xfail  # limited by mypyc
     def test_validate_types_NotImplemented(self, implements_info):
-        npinfo = _NumPyInfo(*implements_info, types=NotImplemented)
+        npinfo = _NumPyInfo(*implements_info, types=NotImplemented, dispatch_on=object)
 
         assert npinfo.validate_types(()) is False
 
     def test_validate_types_NotDispatched(self, implements_info):
-        npinfo = _NumPyInfo(*implements_info, types=_NOT_DISPATCHED)
+        npinfo = _NumPyInfo(*implements_info, types=_NOT_DISPATCHED, dispatch_on=object)
 
         assert npinfo.validate_types(()) is False
 
     def test_validate_types_TypeConstraint(self, implements_info):
         # TODO! go through more TypeConstraint
-        npinfo = _NumPyInfo(*implements_info, types=Invariant(Real))
+        npinfo = _NumPyInfo(*implements_info, types=Invariant(Real), dispatch_on=object)
 
         assert npinfo.validate_types((Real,)) is True
         assert npinfo.validate_types((Real, Real)) is True
@@ -97,7 +118,7 @@ class Test__NumPyInfo:
 
     def test_validate_types_Collection(self, implements_info):
         # TODO! go through more TypeConstraint
-        npinfo = _NumPyInfo(*implements_info, types=(Invariant(Real), Invariant(Complex)))
+        npinfo = _NumPyInfo(*implements_info, types=(Invariant(Real), Invariant(Complex)), dispatch_on=object)
 
         assert npinfo.validate_types((Real,)) is True
         assert npinfo.validate_types((Real, Real)) is True

@@ -29,7 +29,9 @@ def _notdispatched(*args: Any, **kwarg: Any) -> NoReturn:
     raise NotImplementedError("not dispatched")
 
 
-_notdispatched_info = _NumPyInfo(func=_notdispatched, implements=_notdispatched, types=_NOT_DISPATCHED)
+_notdispatched_info = _NumPyInfo(
+    func=_notdispatched, implements=_notdispatched, types=_NOT_DISPATCHED, dispatch_on=object
+)
 # The not-dispatched `_NumPyInfo`. All `_Dispatcher` start with this as the base
 # `_NumPyInfo`.
 
@@ -51,7 +53,7 @@ class _Dispatcher:
         self._dispatcher: functools._SingleDispatchCallable[_NumPyInfo]
         self._dispatcher = dispatcher
 
-    def __call__(self, obj: object) -> _NumPyInfo:
+    def __call__(self, obj: object, /) -> _NumPyInfo:
         """Get correct _NumPyInfo for the calling object's type."""
         npinfo: _NumPyInfo = self._dispatcher(obj)
         return npinfo
