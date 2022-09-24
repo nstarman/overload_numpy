@@ -20,10 +20,6 @@ __all__: list[str] = []
 ##############################################################################
 
 
-# def _is_valid_dispatch_type(cls: type) -> TypeGuard[type]:
-#     return isinstance(cls, type) and not isinstance(cls, GenericAlias)
-
-
 class NumPyOverloader(Mapping[Callable[..., Any], _Dispatcher]):
     """Overload :mod:`numpy` functions in ``__array_function__``."""
 
@@ -32,10 +28,10 @@ class NumPyOverloader(Mapping[Callable[..., Any], _Dispatcher]):
     # ===============================================================
     # Mapping
 
-    def __getitem__(self, key: Callable[..., Any]) -> _Dispatcher:
+    def __getitem__(self, key: Callable[..., Any], /) -> _Dispatcher:
         return self._reg[key]
 
-    def __contains__(self, o: object) -> bool:
+    def __contains__(self, o: object, /) -> bool:
         return o in self._reg
 
     def __iter__(self) -> Iterator[Callable[..., Any]]:

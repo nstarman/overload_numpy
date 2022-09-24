@@ -85,12 +85,12 @@ class _NumPyInfo:
         elif not isclass(self.dispatch_on):
             raise TypeError(f"dispatch_on must be a type, not {self.dispatch_on}")
 
-    def validate_types(self, types: Collection[type]) -> bool:
+    def validate_types(self, types: Collection[type], /) -> bool:
         """Check the types of the arguments.
 
         Parameters
         ----------
-        types : collection[type]
+        types : collection[type], positional-only
             Tuple of the types of the arguments.
 
         Returns

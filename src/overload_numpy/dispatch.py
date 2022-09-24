@@ -53,7 +53,7 @@ class _Dispatcher:
         self._dispatcher: functools._SingleDispatchCallable[_NumPyInfo]
         self._dispatcher = dispatcher
 
-    def __call__(self, obj: object) -> _NumPyInfo:
+    def __call__(self, obj: object, /) -> _NumPyInfo:
         """Get correct _NumPyInfo for the calling object's type."""
         npinfo: _NumPyInfo = self._dispatcher(obj)
         return npinfo
