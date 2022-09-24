@@ -47,10 +47,19 @@ class Test__NotDispatched(TypeConstraint_TestBase):
 
     @pytest.fixture(scope="class")
     def constraint(self, constraint_cls) -> TypeConstraint:
-        return _NOT_DISPATCHED
+        return constraint_cls()
+
+    # ===============================================================
+    # Method Tests
 
     def test_validate_type(self, constraint) -> None:
         assert constraint.validate_type(None) is False
+
+    # ===============================================================
+    # Usage Tests
+
+    def test_instance(self, constraint_cls) -> None:
+        assert isinstance(_NOT_DISPATCHED, constraint_cls)
 
 
 ##############################################################################

@@ -41,4 +41,8 @@ class Assists(Generic[R]):
     dispatch_on: type[R]
 
     def __call__(self, *args: Any, **kwargs: Any) -> R:
+        """
+        Call the wrapped function, providing the dispatch type, :mod:`numpy`
+        function, and calling args and kwargs.
+        """
         return self.func(self.dispatch_on, self.implements, *args, **kwargs)

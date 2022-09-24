@@ -94,9 +94,7 @@ def test_entries(overloader, vec1d):
     npinfo = dispatcher(vec1d)
     assert npinfo.func is concatenate
     assert npinfo.implements is np.concatenate
-    assert npinfo.types == {
-        Covariant(Vector1D),
-    }
+    assert npinfo.types == {Covariant(Vector1D)}
 
 
 def test_calling(overloader, vec1d, array):

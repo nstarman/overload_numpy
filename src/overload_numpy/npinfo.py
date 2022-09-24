@@ -30,6 +30,7 @@ Self = TypeVar("Self")
 
 
 @mypyc_attr(allow_interpreted_subclasses=True)
+@dataclass(frozen=True)
 class _NotDispatched(TypeConstraint):
     """A TypeConstraint that always validates to `False`.
 
@@ -40,7 +41,7 @@ class _NotDispatched(TypeConstraint):
         should be deprecated in favor of `NotImplemented` as the special flag.
     """
 
-    def validate_type(self, arg_type: type) -> bool:
+    def validate_type(self, arg_type: type, /) -> bool:
         return False  # never true
 
 

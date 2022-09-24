@@ -46,7 +46,7 @@ class TypeConstraint(metaclass=ABCMeta):
 
 
 @mypyc_attr(allow_interpreted_subclasses=True)
-@dataclass
+@dataclass(frozen=True)
 class Invariant(TypeConstraint):
     """Type constraint for invariance -- the exact type.
 
