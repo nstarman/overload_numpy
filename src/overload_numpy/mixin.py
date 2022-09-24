@@ -26,11 +26,11 @@ class NDFunctionMixin:
 
     Attributes
     ----------
-    NP_FUNC_OVERLOADS : `overload_numpy.NumPyOverloader`
-        A class-attribute of an instance of ``NumPyOverloader``.
+    NP_FUNC_OVERLOADS : |NumPyOverloader|
+        A class-attribute of an instance of |NumPyOverloader|.
     NP_FUNC_TYPES : frozenset[type | TypeConstraint] | None, optional
         A class-attribute of `None` or a `frozenset` of `type` or
-        `overload_numpy.constraints.TypeConstraint`.
+        |TypeConstraint|.
 
     Examples
     --------

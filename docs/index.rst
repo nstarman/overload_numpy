@@ -13,10 +13,9 @@ Implementing an Overload
 First, some imports (and type hints):
 
     >>> from dataclasses import dataclass, fields
-    >>> from typing import ClassVar, TypeVar
+    >>> from typing import ClassVar
     >>> import numpy as np
     >>> from overload_numpy import NumPyOverloader, NDFunctionMixin
-    >>> V = TypeVar("V", bound="Vector1D")
 
 Now we can define a |NumPyOverloader| instance:
 
@@ -33,7 +32,7 @@ The overloads apply to an array wrapping class. Let's define one:
 Now ``numpy`` functions can be overloaded and registered for ``Vector1D``.
 
     >>> @VEC_FUNCS.implements(np.concatenate, Vector1D)
-    ... def concatenate(vec1ds: 'tuple[V, ...]') -> V:
+    ... def concatenate(vec1ds):
     ...     return Vector1D(np.concatenate(tuple(v.x for v in vec1ds)))
 
 Time to check this works:
@@ -60,7 +59,7 @@ work correctly for ``Vector2D``. However,
 type for the overload, so overloads can be customized for subclasses.
 
     >>> @VEC_FUNCS.implements(np.concatenate, Vector2D)
-    ... def concatenate(vec2ds: 'tuple[Vector2D, ...]') -> Vector2D:
+    ... def concatenate(vec2ds):
     ...     print("using Vector2D implementation...")
     ...     return Vector2D(np.concatenate(tuple(v.x for v in vec2ds)),
     ...                     np.concatenate(tuple(v.y for v in vec2ds)))
@@ -79,7 +78,7 @@ subclass, let's see how we could write a more broadly applicable overload:
 
     >>> @VEC_FUNCS.implements(np.concatenate, Vector1D)  # overriding both
     ... @VEC_FUNCS.implements(np.concatenate, Vector2D)  # overriding both
-    ... def concatenate(vecs: 'tuple[V, ...]') -> V:
+    ... def concatenate(vecs):
     ...     VT = type(vecs[0])
     ...     return VT(*(np.concatenate(tuple(getattr(v, f.name) for v in vecs))
     ...                 for f in fields(VT)))
@@ -109,11 +108,11 @@ In the previous examples we wrote implementations for a single NumPy function.
 Overloading the full set of NumPy functions this way would take a long time.
 
 Wouldn't it be better if we could write many fewer, based on groups of NumPy
-functions.
+functions?
 
     >>> stack_funcs = {np.vstack, np.hstack, np.dstack, np.column_stack, np.row_stack}
     >>> @VEC_FUNCS.assists(stack_funcs, types=Vector1D, dispatch_on=Vector1D)
-    ... def stack_assists(dispatch_on, func, vecs: tuple[V, ...], *args, **kwargs) -> V:
+    ... def stack_assists(dispatch_on, func, vecs, *args, **kwargs):
     ...     cls = type(vecs[0])
     ...     return cls(*(func(tuple(getattr(v, f.name) for v in vecs), *args, **kwargs)
     ...                     for f in fields(cls)))
@@ -126,3 +125,18 @@ Checking this works:
 
     >>> np.hstack((vec1d, vec1d))
     Vector1D(x=array([0, 1, 2, 0, 1, 2]))
+
+
+.. toctree::
+   :maxdepth: 1
+   :titlesonly:
+
+   install
+   contributing
+   src/index
+
+
+Contributors
+============
+
+.. include:: ../AUTHORS.rst
