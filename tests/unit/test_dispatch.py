@@ -10,7 +10,7 @@ import pytest
 
 # LOCAL
 from overload_numpy.dispatch import _Dispatcher, _notdispatched, _notdispatched_info
-from overload_numpy.npinfo import _NOT_DISPATCHED, _NumPyInfo
+from overload_numpy.npinfo import _NOT_DISPATCHED, _NumPyFuncOverloadInfo
 
 ##############################################################################
 # TESTS
@@ -25,7 +25,7 @@ def test__notdispatched() -> None:
 
 def test__notdispatched_info() -> None:
     """Test :func:`overload_numpy.overload._notdispatched_info`."""
-    assert isinstance(_notdispatched_info, _NumPyInfo)
+    assert isinstance(_notdispatched_info, _NumPyFuncOverloadInfo)
     assert _notdispatched_info.func is _notdispatched
     assert _notdispatched_info.implements is _notdispatched
     assert _notdispatched_info.types is _NOT_DISPATCHED

@@ -40,7 +40,7 @@ class Vector1D:
         if func not in VEC_FUNCS:
             return NotImplemented
 
-        # Get _NumPyInfo on function, given type of self
+        # Get _NumPyFuncOverloadInfo on function, given type of self
         finfo = VEC_FUNCS[func](self)
         if not finfo.validate_types(types):
             return NotImplemented
