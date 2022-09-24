@@ -56,9 +56,13 @@ class Test_NumPyOverloader:
     def test_implements(self, overloader):
         pass
 
+    @pytest.mark.skip
+    def test_assists(self, overloader):
+        pass
+
     # ===============================================================
     # Usage tests
 
-    @pytest.mark.skip
+    @pytest.mark.incompatible_with_mypyc
     def test_serialization(self, overloader):
         pass

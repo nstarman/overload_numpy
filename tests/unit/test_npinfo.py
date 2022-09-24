@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 # STDLIB
+import pickle
+from copy import copy, deepcopy
 from numbers import Complex, Rational, Real
 from typing import TYPE_CHECKING, Callable
 
@@ -19,6 +21,19 @@ from overload_numpy.npinfo import _NOT_DISPATCHED, _NotDispatched, _NumPyInfo
 if TYPE_CHECKING:
     # STDLIB
     from types import FunctionType
+
+
+##############################################################################
+
+
+class Magnitude:
+    def __init__(self, x) -> None:
+        self._x = x
+
+
+def add(obj1, obj2):
+    return obj1._x + obj2
+
 
 ##############################################################################
 # TESTS
@@ -46,17 +61,10 @@ class Test__NumPyInfo:
 
     @pytest.fixture(scope="class")
     def custom_cls(self):
-        class Magnitude:
-            def __init__(self, x) -> None:
-                self._x = x
-
         return Magnitude
 
     @pytest.fixture(scope="class")
     def implements_info(self) -> tuple[Callable, Callable]:
-        def add(obj1, obj2):
-            return obj1._x + obj2
-
         return add, np.add
 
     @pytest.fixture
@@ -130,3 +138,16 @@ class Test__NumPyInfo:
         assert npinfo.validate_types((Complex,)) is True
         assert npinfo.validate_types((Complex, Real)) is True
         assert npinfo.validate_types((Complex, Rational)) is False
+
+    # ===============================================================
+    # Usage Tests
+
+    @pytest.mark.incompatible_with_mypyc
+    def test_serialization(self, implements_info) -> None:
+        # copying
+        assert copy(implements_info) == implements_info
+        assert deepcopy(implements_info) == implements_info
+
+        # pickling
+        dumps = pickle.dumps(implements_info)
+        assert pickle.loads(dumps) == implements_info

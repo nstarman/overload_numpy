@@ -1,6 +1,10 @@
 ##############################################################################
 # IMPORTS
 
+# STDLIB
+import pickle
+from copy import copy, deepcopy
+
 # THIRDPARTY
 import pytest
 
@@ -30,10 +34,21 @@ def test__notdispatched_info() -> None:
 class Test__Dispatcher:
     """Test :class:`overload_numpy.overload._Dispatcher`."""
 
-    def test___init__(self):
-        dispatcher = _Dispatcher()
+    @pytest.fixture(scope="class")
+    def dispatcher_cls(self) -> type:
+        return _Dispatcher
 
-        assert isinstance(dispatcher, _Dispatcher)
+    @pytest.fixture(scope="class")
+    def dispatcher(self, dispatcher_cls) -> type:
+        return dispatcher_cls()
+
+    # ===============================================================
+    # Method Tests
+
+    def test___init__(self, dispatcher_cls):
+        dispatcher = dispatcher_cls()
+
+        assert isinstance(dispatcher, dispatcher_cls)
         assert hasattr(dispatcher, "_dispatcher")
 
         npinfo = dispatcher._dispatcher(object())
@@ -42,10 +57,10 @@ class Test__Dispatcher:
         assert npinfo.implements is _notdispatched
         assert npinfo.types is _NOT_DISPATCHED
 
-    def test___call__(self):
+    def test___call__(self, dispatcher_cls):
         # singledispatch is well tested, so only need to test that __call__ calls dispaatcher.
 
-        dispatcher = _Dispatcher()
+        dispatcher = dispatcher_cls()
         dispatcher._dispatcher.register(int, lambda *args: _notdispatched_info)
 
         obj = object()
@@ -55,3 +70,22 @@ class Test__Dispatcher:
         obj = 1
         assert dispatcher(obj) is dispatcher._dispatcher(obj)
         assert dispatcher(obj) is _notdispatched_info
+
+    # ===============================================================
+    # Usage Tests
+
+    @pytest.mark.incompatible_with_mypyc
+    @pytest.mark.xfail
+    def test_copy(self, dispatcher) -> None:
+        # TODO! get copy working.
+        # copying
+        assert copy(dispatcher) == dispatcher
+        assert deepcopy(dispatcher) == dispatcher
+
+    @pytest.mark.incompatible_with_mypyc
+    @pytest.mark.xfail
+    def test_serialization(self, dispatcher) -> None:
+        # TODO! get serialization working.
+        # pickling
+        dumps = pickle.dumps(dispatcher)
+        assert pickle.loads(dumps) == dispatcher
