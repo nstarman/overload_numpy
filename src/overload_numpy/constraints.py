@@ -18,7 +18,7 @@ __all__ = ["TypeConstraint", "Invariant", "Covariant", "Contravariant", "Between
 ##############################################################################
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 class TypeConstraint(metaclass=ABCMeta):
     """ABC for constraining an argument type.
 
@@ -45,7 +45,7 @@ class TypeConstraint(metaclass=ABCMeta):
         """
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Invariant(TypeConstraint):
     """Type constraint for invariance -- the exact type.
@@ -79,7 +79,7 @@ class Invariant(TypeConstraint):
         return arg_type is self.bound
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Covariant(TypeConstraint):
     """A covariant constraint -- permitting subclasses.
@@ -114,7 +114,7 @@ class Covariant(TypeConstraint):
         return issubclass(arg_type, self.bound)
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Contravariant(TypeConstraint):
     """A contravariant constraint -- permitting superclasses.
@@ -148,7 +148,7 @@ class Contravariant(TypeConstraint):
         return issubclass(self.bound, arg_type)
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Between(TypeConstraint):
     """Type constrained between two types.

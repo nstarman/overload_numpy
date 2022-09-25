@@ -29,7 +29,7 @@ Self = TypeVar("Self")
 ##############################################################################
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class _NotDispatched(TypeConstraint):
     """A TypeConstraint that always validates to `False`.

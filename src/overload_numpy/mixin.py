@@ -9,6 +9,9 @@ from typing import TYPE_CHECKING, Any, Callable, ClassVar, Collection
 # THIRDPARTY
 from mypy_extensions import mypyc_attr
 
+# LOCAL
+from overload_numpy.assists import _Assists
+
 if TYPE_CHECKING:
     # LOCAL
     from overload_numpy.constraints import TypeConstraint
@@ -20,7 +23,7 @@ if TYPE_CHECKING:
 ##############################################################################
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 class NDFunctionMixin:
     """Mixin for adding |__array_function__| to a class.
 
@@ -184,7 +187,7 @@ class NDFunctionMixin:
             The result of calling the overloaded functions.
         """
         # Check if can be dispatched.
-        if func not in self.NP_FUNC_OVERLOADS:
+        if not self.NP_FUNC_OVERLOADS.__contains__(func):
             return NotImplemented
 
         # Get _NumPyFuncOverloadInfo on function, given type of self.
@@ -200,4 +203,6 @@ class NDFunctionMixin:
 
         # TODO! validation for args and kwargs.
 
-        return finfo.func(*args, **kwargs)  # returns the result or NotImplemented
+        # Direct impolementation versus assists
+        init_info = (self.__class__,) if isinstance(finfo.func, _Assists) else ()
+        return finfo.func(*init_info, *args, **kwargs)  # Returns result or NotImplemented

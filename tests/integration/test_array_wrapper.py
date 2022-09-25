@@ -81,7 +81,7 @@ def test_entries(overloader, vec1d):
 
     # Only `numpy.add` is registered.
     assert np.concatenate in overloader
-    assert {np.concatenate} == overloader.keys()
+    assert {"numpy.concatenate"} == overloader.keys()
 
     # `numpy` function -> Dispatcher
     dispatcher = overloader[np.concatenate]
