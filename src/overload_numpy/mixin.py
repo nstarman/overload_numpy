@@ -9,6 +9,9 @@ from typing import TYPE_CHECKING, Any, Callable, ClassVar, Collection
 # THIRDPARTY
 from mypy_extensions import mypyc_attr
 
+# LOCAL
+from overload_numpy.assists import _Assists
+
 if TYPE_CHECKING:
     # LOCAL
     from overload_numpy.constraints import TypeConstraint
@@ -200,4 +203,6 @@ class NDFunctionMixin:
 
         # TODO! validation for args and kwargs.
 
-        return finfo.func(*args, **kwargs)  # returns the result or NotImplemented
+        # Direct impolementation versus assists
+        init_info = (self.__class__,) if isinstance(finfo.func, _Assists) else ()
+        return finfo.func(*init_info, *args, **kwargs)  # Returns result or NotImplemented

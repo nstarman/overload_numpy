@@ -57,7 +57,7 @@ class _Assists(Generic[R]):
     implements: Callable[..., Any]
     """The overloaded :mod:`numpy` function."""
 
-    def __call__(self, *args: Any, **kwargs: Any) -> R:
+    def __call__(self, calling_type: type, /, *args: Any, **kwargs: Any) -> R:
         """
         Call the wrapped function, providing the dispatch type, :mod:`numpy`
         function, and calling args and kwargs.
@@ -74,4 +74,4 @@ class _Assists(Generic[R]):
         ``R``
             The return output type of ``func``.
         """
-        return self.func(self.dispatch_on, self.implements, *args, **kwargs)
+        return self.func(calling_type, self.implements, *args, **kwargs)
