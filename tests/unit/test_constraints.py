@@ -2,14 +2,16 @@
 # IMPORTS
 
 # STDLIB
+import pickle
 from abc import ABCMeta, abstractmethod
+from copy import copy, deepcopy
 from dataclasses import dataclass
 from typing import Protocol
 
 # THIRDPARTY
 import pytest
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy.constraints import (
     Between,
     Contravariant,
@@ -68,6 +70,19 @@ class TypeConstraint_TestBase(metaclass=ABCMeta):
     @abstractmethod
     def test_validate_type(self, constraint, types) -> None:
         pass
+
+    # ===============================================================
+    # Usage Tests
+
+    @pytest.mark.incompatible_with_mypyc
+    def test_serialization(self, constraint) -> None:
+        # copying
+        assert copy(constraint) == constraint
+        assert deepcopy(constraint) == constraint
+
+        # pickling
+        dumps = pickle.dumps(constraint)
+        assert pickle.loads(dumps) == constraint
 
 
 class Test_Invariant(TypeConstraint_TestBase):

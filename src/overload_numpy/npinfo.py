@@ -12,7 +12,7 @@ from typing import Any, Callable, TypeVar, final
 # THIRDPARTY
 from mypy_extensions import mypyc_attr
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy.constraints import TypeConstraint
 
 __all__: list[str] = []
@@ -29,7 +29,8 @@ Self = TypeVar("Self")
 ##############################################################################
 
 
-@mypyc_attr(allow_interpreted_subclasses=True)
+@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@dataclass(frozen=True)
 class _NotDispatched(TypeConstraint):
     """A TypeConstraint that always validates to `False`.
 
@@ -40,7 +41,7 @@ class _NotDispatched(TypeConstraint):
         should be deprecated in favor of `NotImplemented` as the special flag.
     """
 
-    def validate_type(self, arg_type: type) -> bool:
+    def validate_type(self, arg_type: type, /) -> bool:
         return False  # never true
 
 
@@ -52,8 +53,26 @@ _NOT_DISPATCHED = _NotDispatched()
 
 @final
 @dataclass(frozen=True)
-class _NumPyInfo:
-    """Info to overload a :mod:`numpy` function."""
+class _NumPyFuncOverloadInfo:
+    """Info to overload a :mod:`numpy` function.
+
+    Parameters
+    ----------
+    func : Callable[..., Any]
+        The overloading function.
+    implements
+        The overloaded :mod:`numpy` function.
+    types: TypeConstraint or Collection[TypeConstraint]
+        The argument types for the overloaded function.
+        Used to check if the overload is valid.
+    dispatch_on: type
+        The type dispatched on. See `~overload_numpy.dispatch._Dispatcher`.
+
+    Methods
+    -------
+    validate_types
+        Check the types of the arguments.
+    """
 
     func: Callable[..., Any]
     """The overloading function."""
@@ -61,12 +80,11 @@ class _NumPyInfo:
     implements: Callable[..., Any]
     """The overloaded :mod:`numpy` function."""
 
+    # TODO! when py3.10+ add NotImplemented
     types: TypeConstraint | Collection[TypeConstraint]
     """
     The argument types for the overloaded function.
     Used to check if the overload is valid.
-
-    :todo: py3.10+ add NotImplemented
     """
 
     dispatch_on: type
@@ -120,5 +138,9 @@ class _NumPyInfo:
             return True
 
     def __call__(self: Self, *args: Any) -> Self:
-        """Return self. Used for singledispatch in _Dispatcher."""
+        """Return self.
+
+        Used for `~functools.singledispatch` in
+        `~overload_numpy.dispatch._Dispatcher`.
+        """
         return self

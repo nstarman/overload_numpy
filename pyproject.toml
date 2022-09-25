@@ -144,7 +144,7 @@
   import_heading_stdlib = "STDLIB"
   import_heading_firstparty = "FIRSTPARTY"
   import_heading_thirdparty = "THIRDPARTY"
-  import_heading_localfolder = "LOCALFOLDER"
+  import_heading_localfolder = "LOCAL"
 
 
 [tool.mypy]
@@ -169,24 +169,6 @@
   [[tool.mypy.overrides]]
     module = "tests/*"
     ignore_errors = true
-
-
-[tool.pytest.ini_options]
-  testpaths = ["tests", "src/overload_numpy", "docs"]
-  astropy_header = "True"
-  doctest_plus = "enabled"
-  text_file_format = "rst"
-  addopts = "--doctest-rst"
-  markers = [
-    "incompatible_with_mypyc: run when testing mypyc compiled black"
-  ]
-  filterwarnings = [
-    # tomlkit
-    "ignore:The config value `project' has type `String', defaults to `str'.",
-    "ignore:The config value `htmlhelp_basename' has type `String', defaults to `str'.",
-    # distutils
-    "ignore:distutils Version classes are deprecated."
-  ]
 
 
 [tool.coverage.run]

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Callable
 import numpy as np
 import pytest
 
-# LOCALFOLDER
+# LOCAL
 from overload_numpy import NumPyOverloader
 from overload_numpy.constraints import Covariant
 from overload_numpy.dispatch import _notdispatched_info
@@ -40,7 +40,7 @@ class Vector1D:
         if func not in VEC_FUNCS:
             return NotImplemented
 
-        # Get _NumPyInfo on function, given type of self
+        # Get _NumPyFuncOverloadInfo on function, given type of self
         finfo = VEC_FUNCS[func](self)
         if not finfo.validate_types(types):
             return NotImplemented
@@ -94,9 +94,7 @@ def test_entries(overloader, vec1d):
     npinfo = dispatcher(vec1d)
     assert npinfo.func is concatenate
     assert npinfo.implements is np.concatenate
-    assert npinfo.types == {
-        Covariant(Vector1D),
-    }
+    assert npinfo.types == {Covariant(Vector1D)}
 
 
 def test_calling(overloader, vec1d, array):

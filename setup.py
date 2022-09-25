@@ -68,8 +68,8 @@ if not USE_MYPYC:
 else:
     print("BUILDING `overload_numpy` WITH MYPYC")
 
-    blocklist = [
-        # TODO!
+    blocklist = [  # TODO!
+        "overload_numpy/assists.py",  # https://github.com/python/mypy/issues/13304
         "overload_numpy/dispatch.py",  # https://github.com/python/mypy/issues/13613
     ]
     discovered: list[Path] = []
