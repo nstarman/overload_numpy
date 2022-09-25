@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 ##############################################################################
 
 
-@mypyc_attr(allow_interpreted_subclasses=True, serializable=True)
+@mypyc_attr(allow_interpreted_subclasses=True)
 class NDFunctionMixin:
     """Mixin for adding |__array_function__| to a class.
 
