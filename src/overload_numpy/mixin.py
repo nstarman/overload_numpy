@@ -187,7 +187,7 @@ class NDFunctionMixin:
             The result of calling the overloaded functions.
         """
         # Check if can be dispatched.
-        if func not in self.NP_FUNC_OVERLOADS:
+        if not self.NP_FUNC_OVERLOADS.__contains__(func):
             return NotImplemented
 
         # Get _NumPyFuncOverloadInfo on function, given type of self.
