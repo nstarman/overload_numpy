@@ -3,7 +3,7 @@ Overload ``NumPy`` ufuncs and functions
 
 .. container::
 
-    |PyPI status| |coverage status| |RTD status| |black status| |pre-commit status| 
+    |PyPI status| |coverage status| |RTD status| |black status| |pre-commit status|
 
 
 ``overload_numpy`` provides easy-to-use tools for working with ``NumPy``'s ``__array_(u)func(tion)__``.
