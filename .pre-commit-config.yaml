@@ -72,7 +72,7 @@ repos:
         additional_dependencies: [toml]
 
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.5.1
+    rev: 1.5.2
     hooks:
       - id: nbqa-flake8
         args:
@@ -92,7 +92,7 @@ repos:
         - flake8-typing-imports==1.12.0
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v0.971'
+    rev: 'v0.981'
     hooks:
       - id: mypy
         args:
