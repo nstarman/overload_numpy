@@ -1,7 +1,13 @@
-Overload ``NumPy`` functions
-############################
+Overload ``NumPy`` ufuncs and functions
+#######################################
 
-Tools for implementing ``__array_function__`` on custom functions.
+.. container::
+
+    |PyPI status| |coverage status| |RTD status| |black status| |pre-commit status|
+
+
+``overload_numpy`` provides easy-to-use tools for working with ``NumPy``'s ``__array_(u)func(tion)__``.
+The library is fully typed and wheels are compiled with mypyc.
 
 
 Implementing an Overload
@@ -125,3 +131,24 @@ Details
 -------
 
 See the Docs.
+
+
+.. |black status| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+   :alt: Codestyle Black
+
+.. |coverage status| image:: https://codecov.io/gh/nstarman/overload_numpy/branch/main/graph/badge.svg
+    :target: https://codecov.io/gh/nstarman/overload_numpy
+    :alt: overload_numpy's Coverage Status
+
+.. |pre-commit status| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+   :target: https://github.com/pre-commit/pre-commit
+   :alt: pre-commit
+
+.. |PyPI status| image:: https://img.shields.io/pypi/v/overload_numpy.svg
+    :target: https://pypi.org/project/overload_numpy
+    :alt: overload_numpy's PyPI Status
+
+.. |RTD status| image:: https://readthedocs.org/projects/overload-numpy/badge/?version=latest
+    :target: https://overload-numpy.readthedocs.io/en/latest/?badge=latest
+    :alt: overload_numpy's Documentation Status
