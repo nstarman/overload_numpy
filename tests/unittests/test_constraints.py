@@ -5,13 +5,13 @@
 import pickle
 from abc import ABCMeta, abstractmethod
 from copy import copy, deepcopy
-from dataclasses import dataclass
 from typing import Protocol
 
 # THIRDPARTY
 import pytest
 
 # LOCAL
+from .data import A, B, C
 from overload_numpy.constraints import (
     Between,
     Contravariant,
@@ -19,25 +19,6 @@ from overload_numpy.constraints import (
     Invariant,
     TypeConstraint,
 )
-
-##############################################################################
-# IMPORTS
-
-
-@dataclass
-class A:
-    x: int
-
-
-@dataclass
-class B(A):
-    pass
-
-
-@dataclass
-class C(B):
-    pass
-
 
 ##############################################################################
 # TESTS

@@ -4,33 +4,44 @@
 from __future__ import annotations
 
 # STDLIB
-from abc import ABCMeta
-from collections.abc import Collection
-from dataclasses import dataclass
+from typing import Container  # noqa: F401
+from typing import Iterable  # noqa: F401
 from typing import (
+    TYPE_CHECKING,
     Any,
-    Callable,
-    Final,
+    Collection,
     Iterator,
     KeysView,
     Mapping,
-    TypeVar,
     ValuesView,
+    overload,
 )
 
 # LOCAL
-from overload_numpy.assists import _Assists
-from overload_numpy.constraints import Covariant, TypeConstraint
-from overload_numpy.dispatch import _Dispatcher
-from overload_numpy.npinfo import _NumPyFuncOverloadInfo
+from overload_numpy._typeutils import UFuncLike
+from overload_numpy.utils import UFMsT, _get_key, _parse_methods
+from overload_numpy.wrapper.dispatch import Dispatcher
+
+if TYPE_CHECKING:
+    # STDLIB
+    from collections.abc import Callable
+    from types import FunctionType
+
+    # LOCAL
+    from overload_numpy.constraints import TypeConstraint
+    from overload_numpy.wrapper.dispatch import All_Dispatchers
+    from overload_numpy.wrapper.func import (
+        AssistsFuncDecorator,
+        ImplementsFuncDecorator,
+    )
+    from overload_numpy.wrapper.many import AssistsManyDecorator
+    from overload_numpy.wrapper.ufunc import (
+        AssistsUFuncDecorator,
+        ImplementsUFuncDecorator,
+    )
+
 
 __all__: list[str] = []
-
-##############################################################################
-# TYPING
-
-C = TypeVar("C", bound=Callable[..., Any])
-R = TypeVar("R")
 
 
 ##############################################################################
@@ -38,65 +49,46 @@ R = TypeVar("R")
 ##############################################################################
 
 
-def _get_key(key: str | Callable[..., Any] | Any) -> str:
-    """Get the key.
-
-    Parameters
-    ----------
-    key : str or Callable[..., Any]
-        The key.
-
-    Returns
-    -------
-    str
-
-    Raises
-    ------
-    ValueError
-        If the key is not one of the known types.
+# @dataclass(frozen=True)  # TODO: when
+# https://github.com/python/mypy/issues/13304 fixed
+#
+# Dispatcher[ImplementsUFunc] | Dispatcher[ImplementsFunc] |
+# Dispatcher[AssistsFunc] | Dispatcher[AssistsUFunc]  # TODO: when py3.10+
+# https://bugs.python.org/issue42233
+class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
     """
-    if isinstance(key, str):
-        return key
-    elif callable(key):
-        return f"{key.__module__}.{key.__name__}"
-    else:
-        raise ValueError(f"the key {key} is not a str or Callable[..., Any]")
+    Register :mod:`numpy` function overrides.
 
-
-class NumPyOverloader(Mapping[str, _Dispatcher]):
-    """Overload :mod:`numpy` functions with |__array_function__|.
-
-    Parameters
-    ----------
-    _reg : dict[str, |`~overload_numpy.dispatch._Dispatcher`|], optional
-        Registry of overloaded functions. You probably don't want to pass this
-        as a parameter.
+    This mapping works in conjunction with a mixin
+    (:class:`~overload_numpy.NPArrayFuncOverloadMixin`,
+    :class:`~overload_numpy.NPArrayUFuncOverloadMixin`,
+    or :class:`~overload_numpy.NPArrayOverloadMixin`) to register and implement
+    overrides with |array_function|_ and |array_ufunc|_.
 
     Examples
     --------
     First, some imports:
 
-        >>> from __future__ import annotations
         >>> from dataclasses import dataclass, fields
         >>> from typing import ClassVar
         >>> import numpy as np
-        >>> from overload_numpy import NumPyOverloader, NDFunctionMixin
+        >>> from overload_numpy import NumPyOverloader, NPArrayFuncOverloadMixin
 
     Now we can define a |NumPyOverloader| instance:
 
-        >>> VEC_FUNCS = NumPyOverloader()
+        >>> W_FUNCS = NumPyOverloader()
 
     The overloads apply to an array wrapping class. Let's define one:
 
         >>> @dataclass
-        ... class Vector1D(NDFunctionMixin):
+        ... class Wrap1D(NPArrayFuncOverloadMixin):
         ...     '''A simple array wrapper.'''
         ...     x: np.ndarray
-        ...     NP_FUNC_OVERLOADS: ClassVar[NumPyOverloader] = VEC_FUNCS
+        ...     NP_OVERLOADS: ClassVar[NumPyOverloader] = W_FUNCS
 
-    Now ``numpy`` functions can be overloaded and registered for ``Vector1D``.
+    Now ``numpy`` functions can be overloaded and registered for ``Wrap1D``.
 
-        >>> @VEC_FUNCS.implements(np.concatenate, Vector1D)
+        >>> @W_FUNCS.implements(np.concatenate, Wrap1D)
         ... def concatenate(vecs):
         ...     VT = type(vecs[0])
         ...     return VT(*(np.concatenate(tuple(getattr(v, f.name) for v in vecs))
@@ -104,21 +96,24 @@ class NumPyOverloader(Mapping[str, _Dispatcher]):
 
     Time to check this works:
 
-        >>> vec1d = Vector1D(np.arange(3))
+        >>> vec1d = Wrap1D(np.arange(3))
         >>> np.concatenate((vec1d, vec1d))
-        Vector1D(x=array([0, 1, 2, 0, 1, 2]))
+        Wrap1D(x=array([0, 1, 2, 0, 1, 2]))
     """
 
-    _reg: Final[dict[str, _Dispatcher]] = {}
-    """Registry of overloaded functions.
+    def __init__(self) -> None:
+        self.__post_init__()  # initialize this way for `dataclasses.dataclass` subclasses.
 
-    You probably don't want to pass this as a parameter.
-    """
+    def __post_init__(self) -> None:
+        # `_reg` is initialized here for `dataclasses.dataclass` subclasses.
+        self._reg: dict[str, All_Dispatchers]
+        object.__setattr__(self, "_reg", {})  # compatible with frozen dataclass
+        # TODO  parametrization of Dispatcher.  Use All_Dispatchers
 
     # ===============================================================
     # Mapping
 
-    def __getitem__(self, key: str | Callable[..., Any], /) -> _Dispatcher:
+    def __getitem__(self, key: str | Callable[..., Any], /) -> All_Dispatchers:
         return self._reg[_get_key(key)]
 
     def __contains__(self, o: object, /) -> bool:
@@ -133,79 +128,46 @@ class NumPyOverloader(Mapping[str, _Dispatcher]):
     def keys(self) -> KeysView[str]:
         return self._reg.keys()
 
-    def values(self) -> ValuesView[_Dispatcher]:
+    def values(self) -> ValuesView[All_Dispatchers]:
         return self._reg.values()
 
     # ===============================================================
 
-    def _parse_types(
-        self,
-        types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
-        dispatch_type: type,
-        /,
-    ) -> frozenset[TypeConstraint]:
-        """Parse types argument ``.implements()``.
-
-        Parameters
-        ----------
-        types : type or TypeConstraint or Collection[type | TypeConstraint] or
-        None
-            The types for argument ``types`` in |__array_function__|. If
-            `None`, then ``dispatch_type`` must have class-level attribute
-            ``NP_FUNC_TYPES`` that is a `frozenset` of `type` or
-            `overload_numpy.constraints.TypeConstraint`.
-
-        Returns
-        -------
-        frozenset[TypeConstraint]
-            The set of TypeConstraint containing the constraints ono the types.
-
-        Raises
-        ------
-        ValueError
-            If ``types`` is the wrong type.
-        AttributeError
-            If ``types`` is `None` and ``dispatch_type`` does not have an
-            attribute ``NP_FUNC_TYPES``.
-            If ``dispatch_type.NP_FUNC_TYPES`` is not a `frozenset` of `type` or
-            `overload_numpy.constraints.TypeConstraint
-        """
-        if types is not None:
-            ts = types
-        elif not hasattr(dispatch_type, "NP_FUNC_TYPES"):
-            raise AttributeError(f"if types is None {dispatch_type} must have class-attribute ``NP_FUNC_TYPES``")
-        else:
-            ts = getattr(dispatch_type, "NP_FUNC_TYPES")
-
-            if not isinstance(ts, frozenset) or not all(isinstance(t, (type, TypeConstraint)) for t in ts):
-                raise AttributeError(
-                    f"if types is None ``{dispatch_type}.NP_FUNC_TYPES`` must be frozenset[types | TypeConstraint]"
-                )
-
-            ts = frozenset({dispatch_type} | ts)  # Adds self type!
-
-        # Turn `types` into only TypeConstraint
-        parsed: frozenset[TypeConstraint]
-        if isinstance(ts, TypeConstraint):
-            parsed = frozenset((ts,))
-        elif isinstance(ts, type):
-            parsed = frozenset((Covariant(ts),))
-        elif isinstance(ts, Collection):
-            parsed = frozenset(t if isinstance(t, TypeConstraint) else Covariant(t) for t in ts)
-        else:
-            raise ValueError(f"types must be a {self.implements.__annotations__['types']}")
-
-        return parsed
-
+    @overload
     def implements(
         self,
-        numpy_func: Callable[..., Any],
+        numpy_func: UFuncLike,
         /,
         dispatch_on: type,
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
-    ) -> _ImplementsDecorator:
-        """Register an |__array_function__| implementation object.
+        methods: UFMsT = "__call__",
+    ) -> ImplementsUFuncDecorator:
+        ...
+
+    @overload
+    def implements(
+        self,
+        numpy_func: FunctionType,
+        /,
+        dispatch_on: type,
+        *,
+        types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
+        methods: UFMsT = "__call__",
+    ) -> ImplementsFuncDecorator:
+        ...
+
+    def implements(
+        self,
+        numpy_func: UFuncLike | Callable[..., Any],
+        /,
+        dispatch_on: type,
+        *,
+        types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
+        methods: UFMsT = "__call__",
+    ) -> ImplementsUFuncDecorator | ImplementsFuncDecorator:
+        """
+        Register an |array_function|_ implementation object.
 
         This is a decorator factory, returning ``decorator``, which registers
         the decorated function as an overload method for :mod:`numpy` function
@@ -218,16 +180,17 @@ class NumPyOverloader(Mapping[str, _Dispatcher]):
         dispatch_on : type
             The class type for which the overload implementation is being
             registered.
-        types : type or TypeConstraint or Collection thereof or None,
-        keyword-only
+
+        types : type or TypeConstraint or Collection thereof or None, keyword-only
             The types of the arguments of `numpy_func`. See
-            |__array_function__|
-            If `None` then ``dispatch_on`` must have class-level attribute
-            ``NP_FUNC_TYPES`` specifying the types.
+            |array_function|_. If `None` then ``dispatch_on`` must have
+            class-level attribute ``NP_FUNC_TYPES`` specifying the types.
+        methods :  {'__call__', 'accumulate', 'outer', 'reduce'} or None, keyword-only
+            `numpy.ufunc` methods.
 
         Returns
         -------
-        `~overload_numpy.overload._ImplementsDecorator`
+        `~overload_numpy.overload.ImplementsFuncDecorator`
             Decorator to register the wrapped function.
 
         Examples
@@ -237,19 +200,21 @@ class NumPyOverloader(Mapping[str, _Dispatcher]):
             >>> from dataclasses import dataclass, fields
             >>> from typing import ClassVar
             >>> import numpy as np
-            >>> from overload_numpy import NumPyOverloader, NDFunctionMixin
+            >>> from overload_numpy import NumPyOverloader, NPArrayFuncOverloadMixin
 
-            >>> VEC_FUNCS = NumPyOverloader()
+            >>> W_FUNCS = NumPyOverloader()
 
             >>> @dataclass
-            ... class Vector1D(NDFunctionMixin):
+            ... class Wrap1D(NPArrayFuncOverloadMixin):
             ...     '''A simple array wrapper.'''
             ...     x: np.ndarray
-            ...     NP_FUNC_OVERLOADS: ClassVar[NumPyOverloader] = VEC_FUNCS
+            ...     NP_OVERLOADS: ClassVar[NumPyOverloader] = W_FUNCS
+
+            >>> w1d = Wrap1D(np.arange(3))
 
         Now we can register an ``implements`` functions.
 
-            >>> @VEC_FUNCS.implements(np.concatenate, Vector1D)  # overriding
+            >>> @W_FUNCS.implements(np.concatenate, Wrap1D)  # overriding
             ... def concatenate(vecs):
             ...     VT = type(vecs[0])
             ...     return VT(*(np.concatenate(tuple(getattr(v, f.name) for v in vecs))
@@ -257,23 +222,86 @@ class NumPyOverloader(Mapping[str, _Dispatcher]):
 
         Checking it works:
 
-            >>> vec1d = Vector1D(np.arange(3))
+            >>> vec1d = Wrap1D(np.arange(3))
 
             >>> newvec = np.concatenate((vec1d, vec1d))
             >>> newvec
             Vector2D(x=array([0, 1, 2, 0, 1, 2]), y=array([3, 4, 5, 3, 4, 5]))
-        """
-        return _ImplementsDecorator(self, numpy_func=numpy_func, types=types, dispatch_on=dispatch_on)
 
+        ``implements`` also works for |ufunc|:
+
+            >>> @W_FUNCS.implements(np.add, Wrap1D)
+            ... def add(w1, w2):
+            ...     return Wrap1D(np.add(w1.x, w2.x))
+
+            >>> np.add(w1d, w1d)
+            Wrap1D(x=array([0, 2, 4]))
+        """
+        if isinstance(numpy_func, UFuncLike):
+            # LOCAL
+            from overload_numpy.wrapper.ufunc import ImplementsUFuncDecorator
+
+            if types is not None:
+                raise ValueError(f"when implementing a ufunc, types must be None, not {types}")
+
+            ms = _parse_methods(methods)
+            return ImplementsUFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, methods=ms)
+
+        else:
+            # LOCAL
+            from overload_numpy.wrapper.func import ImplementsFuncDecorator
+
+            return ImplementsFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, types=types)
+
+    # ---------------------------------------------------------------
+
+    @overload
     def assists(
         self,
-        numpy_funcs: Callable[..., Any] | set[Callable[..., Any]],
+        numpy_funcs: UFuncLike,
+        /,
+        dispatch_on: type,
+        *,
+        types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
+        methods: UFMsT,
+    ) -> AssistsUFuncDecorator:
+        ...
+
+    @overload
+    def assists(
+        self,
+        numpy_funcs: FunctionType,
+        /,
+        dispatch_on: type,
+        *,
+        types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
+        methods: UFMsT,
+    ) -> AssistsFuncDecorator:
+        ...
+
+    @overload
+    def assists(
+        self,
+        numpy_funcs: set[Callable[..., Any] | UFuncLike],
         /,
         dispatch_on: type,
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
-    ) -> _AssistsManyDecorator:
-        """Register an |__array_function__| assistance function.
+        methods: UFMsT = "__call__",
+    ) -> AssistsManyDecorator:
+        ...
+
+    def assists(
+        self,
+        numpy_funcs: UFuncLike | Callable[..., Any] | set[Callable[..., Any] | UFuncLike],
+        /,
+        dispatch_on: type,
+        *,
+        types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
+        methods: UFMsT = "__call__",
+    ) -> AssistsUFuncDecorator | AssistsFuncDecorator | AssistsManyDecorator:
+        """
+        Register an |array_function|_ assistance function.
 
         This is a decorator factory, returning ``decorator``, which registers
         the decorated function as an overload method for :mod:`numpy` function
@@ -281,23 +309,27 @@ class NumPyOverloader(Mapping[str, _Dispatcher]):
 
         Parameters
         ----------
-        numpy_func : callable[..., Any], positional-only
+        numpy_funcs : callable[..., Any], positional-only
             The :mod:`numpy` function that is being overloaded.
         dispatch_on : type
             The class type for which the overload implementation is being
             registered.
-        types : type or TypeConstraint or Collection thereof or None,
-        keyword-only
-            The types of the arguments of `numpy_func`. See
-            |__array_function__|
+        types : type or TypeConstraint or Collection thereof or None, keyword-only
+            The types of the arguments of ``numpy_func``.
+            See |array_function|_ for details.
+            Only used if a function (not |ufunc|) is being overridden.
             If `None` then ``dispatch_on`` must have class-level attribute
             ``NP_FUNC_TYPES`` specifying the types.
+        methods : {'__call__', 'at', 'accumulate', 'outer', 'reduce', 'reduceat'} or set thereof, keyword-only
+            The |ufunc| methods for which this override applies.
+            Default is just "__call__".
+            Only used if a |ufunc| (not function) is being overridden.
 
         Returns
         -------
-        `~overload_numpy.overload._AssistsManyDecorator`
-            Decorator to register the wrapped function(s).
-            This decorator should never be called by the user.
+        `~overload_numpy.overload.AssistsManyDecorator`
+            Decorator to register the wrapped function(s). This decorator should
+            never be called by the user.
 
         Examples
         --------
@@ -306,244 +338,89 @@ class NumPyOverloader(Mapping[str, _Dispatcher]):
             >>> from dataclasses import dataclass, fields
             >>> from typing import ClassVar
             >>> import numpy as np
-            >>> from overload_numpy import NumPyOverloader, NDFunctionMixin
+            >>> from overload_numpy import NumPyOverloader, NPArrayFuncOverloadMixin
 
-            >>> VEC_FUNCS = NumPyOverloader()
+            >>> W_FUNCS = NumPyOverloader()
 
             >>> @dataclass
-            ... class Vector1D(NDFunctionMixin):
+            ... class Wrap1D(NPArrayFuncOverloadMixin):
             ...     '''A simple array wrapper.'''
             ...     x: np.ndarray
-            ...     NP_FUNC_OVERLOADS: ClassVar[NumPyOverloader] = VEC_FUNCS
+            ...     NP_OVERLOADS: ClassVar[NumPyOverloader] = W_FUNCS
+
+            >>> w1d = Wrap1D(np.arange(3))
 
         Now we can register ``assists`` functions.
 
             >>> stack_funcs = {np.vstack, np.hstack, np.dstack, np.column_stack, np.row_stack}
-            >>> @VEC_FUNCS.assists(stack_funcs, types=Vector1D, dispatch_on=Vector1D)
+            >>> @W_FUNCS.assists(stack_funcs, types=Wrap1D, dispatch_on=Wrap1D)
             ... def stack_assists(dispatch_on, func, vecs, *args, **kwargs):
             ...     cls = type(vecs[0])
             ...     return cls(*(func(tuple(getattr(v, f.name) for v in vecs), *args, **kwargs)
             ...                     for f in fields(cls)))
 
-        Checking it worked:
+        Checking this works:
 
-            >>> assert np.vstack in VEC_FUNCS
-            True
+            >>> np.vstack((w1d, w1d))
+            Wrap1D(x=array([[0, 1, 2],
+                            [0, 1, 2]]))
+
+            >>> np.hstack((w1d, w1d))
+            Wrap1D(x=array([0, 1, 2, 0, 1, 2]))
+
+        ``assists`` also works for |ufunc|:
+
+            >>> add_funcs = {np.add, np.subtract}
+            >>> @W_FUNCS.assists(add_funcs, types=Wrap1D, dispatch_on=Wrap1D)
+            ... def add_assists(cls, func, w1, w2, *args, **kwargs):
+            ...     return cls(*(func(getattr(w1, f.name), getattr(w2, f.name), *args, **kwargs)
+            ...                  for f in fields(cls)))
+
+        Checking this works:
+
+            >>> np.subtract(w1d, w1d)
+            Wrap1D(x=array([0, 0, 0]))
+
+        We can also to implement the |ufunc| methods, like``accumulate``, for
+        all the ``add_funcs`` overloads:
+
+            >>> @add_assists.register("accumulate")
+            ... def add_accumulate_assists(cls, func, w1, *args, **kwargs):
+            ...     return cls(*(func(getattr(w1, f.name), *args, **kwargs)
+            ...                  for f in fields(cls)))
+
+            >>> np.subtract.accumulate(w1d)
+            Wrap1D(x=array([ 0, -1, -3]))
         """
-        # Make ``numpy_funcs`` into a set[``numpy_func``]
-        setnpfs = numpy_funcs if isinstance(numpy_funcs, set) else {numpy_funcs}
+        if isinstance(numpy_funcs, UFuncLike):
+            # LOCAL
+            from overload_numpy.wrapper.ufunc import AssistsUFuncDecorator
 
-        # Return
-        return _AssistsManyDecorator(
-            _AssistsDecorator(self, numpy_func=npf, types=types, dispatch_on=dispatch_on) for npf in setnpfs
-        )
+            # `types` is ignored for ufuncs
+            ms = _parse_methods(methods)
+            return AssistsUFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_funcs, methods=ms)
 
+        elif callable(numpy_funcs):
+            # LOCAL
+            from overload_numpy.wrapper.func import AssistsFuncDecorator
 
-##############################################################################
-# Decorators for implementations
+            # `methods` is ignored for funcs
+            return AssistsFuncDecorator(overloader=self, numpy_func=numpy_funcs, types=types, dispatch_on=dispatch_on)
 
+        else:
+            # LOCAL
+            from overload_numpy.wrapper.func import AssistsFuncDecorator
+            from overload_numpy.wrapper.many import AssistsManyDecorator
+            from overload_numpy.wrapper.ufunc import AssistsUFuncDecorator
 
-@dataclass(frozen=True)
-class _OverloadDecoratorBase(metaclass=ABCMeta):
-    """Decorator base class for registering an |__array_function__| overload.
-
-    Instances of this class should not be used directly.
-
-    Parameters
-    ----------
-    overloader : |NumPyOverloader|
-        Overloader instance.
-    numpy_func : Callable[..., Any]
-        The :mod:`numpy` function that is being overloaded.
-    types : type or TypeConstraint or Collection thereof or None
-        The types of the arguments of `numpy_func`. See |__array_function__| If
-        `None` then ``dispatch_on`` must have class-level attribute
-        ``NP_FUNC_TYPES`` specifying the types.
-    dispatch_on : type
-            The class type for which the overload implementation is being
-            registered.
-    """
-
-    overloader: NumPyOverloader
-    numpy_func: Callable[..., Any]
-    types: type | TypeConstraint | Collection[type | TypeConstraint] | None
-    dispatch_on: type
-
-    def __post_init__(self) -> None:
-        # Add
-
-        # Make single-dispatcher for numpy function
-        if not self.overloader.__contains__(self.numpy_func):
-            self.overloader._reg[self._reg_key] = _Dispatcher()
-
-        # Turn ``types`` into only TypeConstraint
-        self.overloader._parse_types(self.types, self.dispatch_on)
-
-    @property
-    def _reg_key(self) -> str:
-        return _get_key(self.numpy_func)
-
-    # @abstractmethod  # TODO: fix when https://github.com/python/mypy/issues/5374 released
-    def func_hook(self, func: Callable[..., Any], /) -> Callable[..., Any]:
-        """Function hook.
-
-        Parameters
-        ----------
-        func : Callable[..., Any], positional-only
-            The overloading function.
-
-        Returns
-        -------
-        Callable[..., Any]
-            How the function is overloaded. In ``_ImplementsDecorator`` this just
-            returns ``func``. In ``_AssistsDecorator`` this creates an
-            `~overload_numpy.assists._Assists`.
-
-        Raises
-        ------
-        NotImplementedError
-            This function must be overwritten in child classes.
-        """
-        raise NotImplementedError
-
-    def __call__(self, func: C, /) -> C:
-        """Register an |__array_function__| overload.
-
-        Parameters
-        ----------
-        func : Callable[..., Any]
-            The :mod:`numpy` function to overload.
-
-        Returns
-        -------
-        func : Callable[..., Any]
-            The same as the input``func``.
-
-        Raises
-        ------
-        ValueError
-            If ``self.types`` is the wrong type.
-        AttributeError
-            If ``types`` is `None` and ``dispatch_type`` does not have an
-            attribute ``NP_FUNC_TYPES``.
-            If ``dispatch_type.NP_FUNC_TYPES`` is not a `frozenset` of `type` or
-            `overload_numpy.constraints.TypeConstraint
-        """
-        # TODO? infer dispatch_on from 1st argument
-        # if dispatch_on is None:  # Get from 1st argument
-        #     argname, dispatch_type = next(iter(get_type_hints(func).items()))
-        #     if not _is_valid_dispatch_type(dispatch_type):
-        #         raise TypeError(
-        #             f"Invalid annotation for {argname!r}. "
-        #             f"{dispatch_type!r} is not a class."
-        #         )
-        # else:
-        #     dispatch_type = dispatch_on
-
-        # Turn ``types`` into only TypeConstraint
-        tinfo = self.overloader._parse_types(self.types, self.dispatch_on)
-        # Note: I don't think types cannot be inferred from the function
-        # because NumPy uses a dispatcher object to get the
-        # ``relevant_args``.
-
-        # Adding a new numpy function
-        info = _NumPyFuncOverloadInfo(
-            func=self.func_hook(func), types=tinfo, implements=self.numpy_func, dispatch_on=self.dispatch_on
-        )
-        # Register the function
-        self.overloader._reg[self._reg_key]._dispatcher.register(self.dispatch_on, info)
-        return func
-
-
-@dataclass(frozen=True)
-class _ImplementsDecorator(_OverloadDecoratorBase):
-    """Decorator for registering with |NumPyOverloader|.
-
-    Instances of this class should not be used directly.
-
-    Parameters
-    ----------
-    overloader : |NumPyOverloader|
-        Overloader instance.
-    numpy_func : Callable[..., Any]
-        The :mod:`numpy` function that is being overloaded.
-    types : type or TypeConstraint or Collection thereof or None
-        The types of the arguments of `numpy_func`. See |__array_function__| If
-        `None` then ``dispatch_on`` must have class-level attribute
-        ``NP_FUNC_TYPES`` specifying the types.
-    dispatch_on : type
-            The class type for which the overload implementation is being
-            registered.
-
-    Methods
-    -------
-    func_hook
-        Returns the input ``func`` unchanged.
-    """
-
-    def func_hook(self, func: C, /) -> C:
-        return func
-
-
-@dataclass(frozen=True)
-class _AssistsDecorator(_OverloadDecoratorBase):
-    """Decorator for registering with |NumPyOverloader|.
-
-    Instances of this class should not be used directly.
-
-    Parameters
-    ----------
-    overloader : |NumPyOverloader|
-        Overloader instance.
-    numpy_func : Callable[..., Any]
-        The :mod:`numpy` function that is being overloaded.
-    types : type or TypeConstraint or Collection thereof or None
-        The types of the arguments of `numpy_func`. See |__array_function__| If
-        `None` then ``dispatch_on`` must have class-level attribute
-        ``NP_FUNC_TYPES`` specifying the types.
-    dispatch_on : type
-            The class type for which the overload implementation is being
-            registered.
-
-    Methods
-    -------
-    func_hook
-        Returns the input ``func`` as an `~overload_numpy.assists._Assists` object.
-    """
-
-    def func_hook(self, func: Callable[..., R], /) -> _Assists[R]:
-        return _Assists(func=func, implements=self.numpy_func, dispatch_on=self.dispatch_on)
-
-
-@dataclass(frozen=True)
-class _AssistsManyDecorator:
-    """Decorator for registering many `~overload_numpy.NumPyOverloader.assists` functions.
-
-    Parameters
-    ----------
-    _iterator : Iterator[_AssistsDecorator]
-        Iterator of ``_AssistsDecorator``.
-    """
-
-    _iterator: Iterator[_AssistsDecorator]
-    """Iterator of ``_AssistsDecorator``."""
-
-    def __call__(self, func: C, /) -> C:
-        """Decorate and return ``func``.
-
-        Parameters
-        ----------
-        func : Callable[..., R]
-            Assistance function.
-
-        Returns
-        -------
-        func : Callable[..., R]
-            Same as ``func``.
-        """
-        # Iterate through ``self._iterator``, calling the contained
-        # ``_AssistsDecorator``.
-        for obj in self._iterator:
-            obj(func)
-
-        return func
+            ms = _parse_methods(methods)
+            return AssistsManyDecorator(
+                tuple(
+                    (
+                        AssistsUFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=npf, methods=ms)
+                        if isinstance(npf, UFuncLike)
+                        else AssistsFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=npf, types=types)
+                    )
+                    for npf in numpy_funcs
+                )
+            )

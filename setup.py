@@ -70,8 +70,9 @@ else:
     print("BUILDING `overload_numpy` WITH MYPYC")
 
     blocklist = [  # TODO!
-        "overload_numpy/assists.py",  # https://github.com/python/mypy/issues/13304
-        "overload_numpy/dispatch.py",  # https://github.com/python/mypy/issues/13613
+        "overload_numpy/wrapper/dispatch.py",  # https://github.com/python/mypy/issues/13613
+        "overload_numpy/wrapper/ufunc.py",  # FIXME: can't call ImplementsUFunc
+        "overload_numpy/_typeutils.py",  # https://github.com/mypyc/mypyc/issues/909
     ]
     discovered: list[Path] = []
     discovered.extend(find_python_files(SRC / "overload_numpy"))
