@@ -1,6 +1,6 @@
 .. include:: references.txt
 
-.. overload_numpy-install:
+.. _overload_numpy-install:
 
 ************
 Installation
@@ -48,12 +48,20 @@ the cloned ``overload_numpy`` directory)
     python -m pip install [-e] .
 
 
+To ``c``-transpile and build wheels with ``mypyc``.
+
+.. code-block:: bash
+
+    python -m pip install [-e] . --install-option='--use-mypyc"
+
+
 Python Dependencies
 ===================
 
 This packages has the following dependencies:
 
 * `Python`_ >= 3.8
+* ``mypy_extensions`` >= 0.4.3  : for ``c``-transpilation
 
 Explicit version requirements are specified in the project `pyproject.toml
 <https://github.com/nstarman/overload_numpy/blob/main/pyproject.toml>`_. ``pip``
