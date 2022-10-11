@@ -15,6 +15,8 @@ from setuptools import setup
 ##############################################################################
 # PARAMETERS
 
+USE_MYPYC: bool = False
+
 CURRENT_DIR = Path(__file__).parent
 SRC = CURRENT_DIR / "src"
 
@@ -54,7 +56,6 @@ def find_python_files(base: Path, exclude: tuple[str, ...] = ("test_",)) -> list
 
 
 # To compile with mypyc, a mypyc checkout must be present on the PYTHONPATH
-USE_MYPYC: bool = False
 if len(sys.argv) > 1 and sys.argv[1] == "--use-mypyc":
     sys.argv.pop(1)
     USE_MYPYC = True
@@ -69,8 +70,9 @@ else:
     print("BUILDING `overload_numpy` WITH MYPYC")
 
     blocklist = [  # TODO!
-        "overload_numpy/assists.py",  # https://github.com/python/mypy/issues/13304
-        "overload_numpy/dispatch.py",  # https://github.com/python/mypy/issues/13613
+        "overload_numpy/wrapper/dispatch.py",  # https://github.com/python/mypy/issues/13613
+        "overload_numpy/wrapper/ufunc.py",  # FIXME: can't call ImplementsUFunc
+        "overload_numpy/_typeutils.py",  # https://github.com/mypyc/mypyc/issues/909
     ]
     discovered: list[Path] = []
     discovered.extend(find_python_files(SRC / "overload_numpy"))
@@ -80,4 +82,4 @@ else:
     ext_modules = mypycify(mypyc_targets, opt_level=opt_level, verbose=True)
 
 
-setup(name="overload_numpy", packages=["overload_numpy"], ext_modules=ext_modules)
+setup(name="overload_numpy", package_dir={"": "src"}, ext_modules=ext_modules)

@@ -1,18 +1,26 @@
-.. _overload_numpy:
+.. _overload_numpy-user-guide:
 
-#################################
-Overload NumPy (`overload_numpy`)
-#################################
+##########
+User Guide
+##########
+
+The user guide contains exhaustive descriptions of all of the functions and
+classes available in ``overload_numpy``, with some inline narrative descriptions and
+demonstrations of functionality.
 
 .. toctree::
     :maxdepth: 1
 
+    conventions
+    mixin
+    register
     constraints
 
 
-.. _overload_numpy-api:
+Recent additions and changes
+============================
 
-API
-===
+.. toctree::
+    :maxdepth: 2
 
-.. automodapi:: overload_numpy
+    whatsnew/index

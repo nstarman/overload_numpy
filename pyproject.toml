@@ -30,7 +30,7 @@
     "numpy>=1.18",
     "pytest",
     "pytest-astropy",
-    "typing_extensions>=4.2",
+    "typing_extensions>=4.4",
   ]
   docs = [
     "graphviz",
@@ -79,7 +79,7 @@
   # test_requirements.txt would download a bunch of other packages not necessary
   # here and would slow down the testing step a fair bit.
   test-requires = ["pip install -r .github/test-requirements.txt"]
-  test-command = 'pytest {project}/tests {project}/docs -k "not incompatible_with_mypyc"'
+  test-command = 'pytest {project}/tests {project}/docs -v -k "not incompatible_with_mypyc"'
   # Skip trying to test arm64 builds on Intel Macs. (so cross-compilation doesn't
   # straight up crash)
   test-skip = ["*-macosx_arm64", "*-macosx_universal2:arm64"]
@@ -134,6 +134,34 @@
   '''
 
 
+[tool.coverage.run]
+  omit = [
+    "*/overload_numpy/conftest.py",
+    "*setup_package*",
+    "*/overload_numpy/tests/*",
+  ]
+
+[tool.coverage.report]
+  exclude_lines = [
+    # Have to re-enable the standard pragma
+    # and branches that don't pertain to this version of Python
+    "pragma: no cover",
+    "pragma: py{ignore_python_version}",
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+    # Don't complain if non-runnable code isn't run
+    "if __name__ == .__main__.:",
+    # Don't complain about abstract methods, they aren't run:
+    '@(abc\.)?abstractmethod',
+    # Exclude type check blocks and Protocol contents, they aren't run:
+    "if TYPE_CHECKING:",
+    '\.\.\.',
+    # Don't complain about IPython completion helper
+    "def _ipython_key_completions_",
+  ]
+
+
 [tool.isort]
   profile = "black"
   include_trailing_comma = "True"
@@ -169,34 +197,3 @@
   [[tool.mypy.overrides]]
     module = "tests/*"
     ignore_errors = true
-
-
-[tool.coverage.run]
-  omit = [
-    "*/overload_numpy/_astropy_init*",
-    "*/overload_numpy/conftest.py",
-    "*/overload_numpy/*setup_package*",
-    "*/overload_numpy/tests/*",
-    "*/overload_numpy/*/tests/*",
-    "*/overload_numpy/extern/*",
-    "*/overload_numpy/_version*",
-  ]
-
-[tool.coverage.report]
-  exclude_lines = [
-    # Have to re-enable the standard pragma
-    "pragma: no cover",
-    # Exclude type check blocks
-    "if TYPE_CHECKING:",
-    # Don't complain about packages we have installed
-    "except ImportError",
-    # Don't complain if tests don't hit assertions
-    "raise AssertionError",
-    "raise NotImplementedError",
-    # Don't complain about script hooks
-    "'def main(.*):'",
-    # Ignore branches that don't pertain to this version of Python
-    "pragma: py{ignore_python_version}",
-    # Don't complain about IPython completion helper
-    "def _ipython_key_completions_",
-  ]

@@ -55,6 +55,7 @@ source_suffix = ".rst"
 extensions = [
     "sphinx.ext.doctest",
     "sphinx_automodapi.automodapi",
+    "numpydoc",
     "pytest_doctestplus.sphinx.doctestplus",
 ]
 
@@ -73,6 +74,8 @@ autoclass_content = "both"
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
 rst_epilog = """
+.. |overload_numpy| replace:: :mod:`overload_numpy`
+
 .. |TypeConstraint| replace:: :class:`~overload_numpy.constraints.TypeConstraint`
 .. |Invariant| replace:: :class:`~overload_numpy.constraints.Invariant`
 .. |Covariant| replace:: :class:`~overload_numpy.constraints.Covariant`
@@ -81,15 +84,25 @@ rst_epilog = """
 
 .. |NumPyOverloader| replace:: :class:`~overload_numpy.overload.NumPyOverloader`
 
-.. |__array_function__| replace:: `__array_function__ https://numpy.org/doc/stable/reference/arrays.classes.html#numpy.class.__array_function__`_
-"""  # noqa: E501
+.. |Numpy| replace:: :mod:`numpy`
+.. |numpy| replace:: :mod:`numpy`
+.. |ufunc| replace:: :class:`~numpy.ufunc`
+.. |ndarray| replace:: :class:`~numpy.ndarray`
+.. |array_function| replace:: ``__array_function__``
+.. _array_function: https://numpy.org/doc/stable/reference/arrays.classes.html#numpy.class.__array_function__
+.. |array_ufunc| replace:: ``__array_ufunc__``
+.. _array_ufunc: https://numpy.org/doc/stable/reference/arrays.classes.html#numpy.class.__array_ufunc__
+"""
 
 # intersphinx
 intersphinx_mapping = {
-    "python": (
-        "https://docs.python.org/3/",
-        (None, "http://data.astropy.org/intersphinx/python3.inv"),
+    "python": ("https://docs.python.org/3/", (None, "http://data.astropy.org/intersphinx/python3.inv")),
+    "pythonloc": (
+        "http://docs.python.org/",
+        (None, (pathlib.Path(__file__).parent.parent / "local" / "python3_local_links.inv").resolve()),
     ),
+    "numpy": ("https://numpy.org/doc/stable/", (None, "http://data.astropy.org/intersphinx/numpy.inv")),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", (None, "http://data.astropy.org/intersphinx/scipy.inv")),
 }
 
 # Show / hide TODO blocks
@@ -141,6 +154,21 @@ numpydoc_xref_aliases = {
     "mapping": ":term:`python:mapping`",
 }
 
+# # Report warnings for all validation checks minus specified checsk.
+# numpydoc_validation_checks = {
+#     "all",
+#     "GL01",  # Docstring text (summary) should start in the line immediately after ...
+#     "GL08",  # - The object does not have a docstring  # TODO! rm when does docstring inheritance
+#     "SA01",  # - See Also section not found
+# }
+
+# numpydoc_validation_exclude = {
+#     r"docs\."
+#     r"NumPyOverloader\.get$",
+#     r"NumPyOverloader\.items$",
+# }
+
+
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
@@ -155,6 +183,10 @@ package = sys.modules[project]
 version = get_version("overload_numpy").split("-", 1)[0]
 # The full version, including alpha/beta/rc tags.
 release = get_version("overload_numpy")
+
+# -- automodapi configuration ---------------------------------------------------
+
+# automodsumm_inherited_members = True
 
 
 # -- Options for HTML output ---------------------------------------------------
@@ -193,7 +225,7 @@ html_sidebars = {"**": ["search-field.html", "sidebar-nav-bs.html"]}
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-# html_title = "overload_numpy.[X]"
+html_title = f"overload_numpy v{release}"
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = project + "doc"
