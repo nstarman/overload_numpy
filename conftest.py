@@ -15,17 +15,7 @@ from typing import Any
 
 # THIRDPARTY
 import pytest
-
-ASTROPY_HEADER: bool
-try:
-    # THIRDPARTY
-    from pytest_astropy_header.display import PYTEST_HEADER_MODULES, TESTED_VERSIONS
-
-    ASTROPY_HEADER = True
-except ImportError:
-    ASTROPY_HEADER = False
-else:
-    assert isinstance(PYTEST_HEADER_MODULES, dict)
+from pytest_astropy_header.display import PYTEST_HEADER_MODULES, TESTED_VERSIONS
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -35,9 +25,6 @@ def pytest_configure(config: pytest.Config) -> None:
     ----------
     config : pytest configuration
     """
-    if not ASTROPY_HEADER:
-        return None
-
     config.option.astropy_header = True
 
     # Customize the following lines to add/remove entries from the list of
@@ -46,7 +33,6 @@ def pytest_configure(config: pytest.Config) -> None:
     PYTEST_HEADER_MODULES.pop("Pandas", None)
 
     # STDLIB
-    # from stream import __version__  # type: ignore
     from importlib.metadata import version
 
     packagename = os.path.basename(os.path.dirname(__file__))
