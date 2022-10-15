@@ -212,7 +212,7 @@ class OverloadUFuncDecorator(Generic[UT]):
     dispatch_on : type, keyword-only
         The class type for which the overload implementation is being
         registered.
-    numpy_func : |ufunc|, keyword-only
+    implements : |ufunc|, keyword-only
         The :mod:`numpy` |ufunc| that is being overloaded.
     methods : set[{'__call__', 'at', 'accumulate', 'outer', 'reduce'}], keyword-only
         Set of names of |ufunc| methods.
@@ -222,13 +222,13 @@ class OverloadUFuncDecorator(Generic[UT]):
 
     override_cls: type[UT]
     dispatch_on: type
-    numpy_func: UFuncLike
+    implements: UFuncLike
     methods: frozenset[UFMT]
     overloader: NumPyOverloader
 
     def __post_init__(self) -> None:
         """Make single-dispatcher for numpy function."""
-        key = _get_key(self.numpy_func)
+        key = _get_key(self.implements)
         if key not in self.overloader._reg:
             self.overloader._reg[key] = Dispatcher[UT]()
 
@@ -238,7 +238,7 @@ class OverloadUFuncDecorator(Generic[UT]):
         Parameters
         ----------
         func : Callable[..., Any], positional-only
-            Overloading function for specified ``methods``, ``numpy_func``, and
+            Overloading function for specified ``methods``, ``implements``, and
             ``dispatch_on``.
 
         Returns
@@ -254,13 +254,13 @@ class OverloadUFuncDecorator(Generic[UT]):
         # Adding a new numpy function
         info: UT = self.override_cls(
             _funcs=methods,  # includes __call__
-            implements=self.numpy_func,
+            implements=self.implements,
             dispatch_on=self.dispatch_on,
         )
         # Register the function. The ``info`` is wrapped by ``DispatchWrapper``
         # so `~functools.singledispatch` returns the ``info``.
         # self.dispatcher.register(self.dispatch_on, info)
-        self.overloader[self.numpy_func].register(self.dispatch_on, info)
+        self.overloader[self.implements].register(self.dispatch_on, info)
         return info
 
 

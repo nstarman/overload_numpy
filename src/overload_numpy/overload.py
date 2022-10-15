@@ -149,7 +149,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
     @overload
     def implements(
         self,
-        numpy_func: UFuncLike,
+        implements: UFuncLike,
         /,
         dispatch_on: type,
         *,
@@ -161,7 +161,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
     @overload
     def implements(
         self,
-        numpy_func: FunctionType,
+        implements: FunctionType,
         /,
         dispatch_on: type,
         *,
@@ -172,7 +172,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
     def implements(
         self,
-        numpy_func: UFuncLike | Callable[..., Any],
+        implements: UFuncLike | Callable[..., Any],
         /,
         dispatch_on: type,
         *,
@@ -184,18 +184,18 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
         This is a decorator factory, returning ``decorator``, which registers
         the decorated function as an overload method for :mod:`numpy` function
-        ``numpy_func`` for a class of type ``dispatch_on``.
+        ``implements`` for a class of type ``dispatch_on``.
 
         Parameters
         ----------
-        numpy_func : callable[..., Any], positional-only
+        implements : callable[..., Any], positional-only
             The :mod:`numpy` function that is being overloaded.
         dispatch_on : type
             The class type for which the overload implementation is being
             registered.
 
         types : type or TypeConstraint or Collection thereof or None, keyword-only
-            The types of the arguments of `numpy_func`. See
+            The types of the arguments of `implements`. See
             |array_function|_. If `None` then ``dispatch_on`` must have
             class-level attribute ``NP_FUNC_TYPES`` specifying the types.
         methods :  {'__call__', 'accumulate', 'outer', 'reduce'} or None, keyword-only
@@ -250,7 +250,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
             >>> np.add(w1d, w1d)
             Wrap1D(x=array([0, 2, 4]))
         """
-        if isinstance(numpy_func, UFuncLike):
+        if isinstance(implements, UFuncLike):
             # LOCAL
             from overload_numpy.implementors.ufunc import (
                 ImplementsUFunc,
@@ -262,7 +262,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
             ms = _parse_methods(methods)
             return OverloadUFuncDecorator(
-                ImplementsUFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, methods=ms
+                ImplementsUFunc, overloader=self, dispatch_on=dispatch_on, implements=implements, methods=ms
             )
 
         else:
@@ -273,7 +273,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
             )
 
             return OverloadFuncDecorator(
-                ImplementsFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, types=types
+                ImplementsFunc, overloader=self, dispatch_on=dispatch_on, implements=implements, types=types
             )
 
     # ---------------------------------------------------------------
@@ -316,7 +316,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
     def assists(
         self,
-        numpy_funcs: UFuncLike | Callable[..., Any] | set[Callable[..., Any] | UFuncLike],
+        assists: UFuncLike | Callable[..., Any] | set[Callable[..., Any] | UFuncLike],
         /,
         dispatch_on: type,
         *,
@@ -332,13 +332,13 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
         Parameters
         ----------
-        numpy_funcs : callable[..., Any], positional-only
-            The :mod:`numpy` function that is being overloaded.
+        assists : callable[..., Any], positional-only
+            The :mod:`numpy` function(s) that is(/are) being overloaded.
         dispatch_on : type
             The class type for which the overload implementation is being
             registered.
         types : type or TypeConstraint or Collection thereof or None, keyword-only
-            The types of the arguments of ``numpy_func``.
+            The types of the arguments of ``assists``.
             See |array_function|_ for details.
             Only used if a function (not |ufunc|) is being overridden.
             If `None` then ``dispatch_on`` must have class-level attribute
@@ -415,7 +415,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
             >>> np.subtract.accumulate(w1d)
             Wrap1D(x=array([ 0, -1, -3]))
         """
-        if isinstance(numpy_funcs, UFuncLike):
+        if isinstance(assists, UFuncLike):
             # LOCAL
             from overload_numpy.implementors.ufunc import (
                 AssistsUFunc,
@@ -425,10 +425,10 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
             # `types` is ignored for ufuncs
             ms = _parse_methods(methods)
             return OverloadUFuncDecorator(
-                AssistsUFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_funcs, methods=ms
+                AssistsUFunc, overloader=self, dispatch_on=dispatch_on, implements=assists, methods=ms
             )
 
-        elif callable(numpy_funcs):
+        elif callable(assists):
             # LOCAL
             from overload_numpy.implementors.func import (
                 AssistsFunc,
@@ -437,7 +437,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
             # `methods` is ignored for funcs
             return OverloadFuncDecorator(
-                AssistsFunc, overloader=self, numpy_func=numpy_funcs, types=types, dispatch_on=dispatch_on
+                AssistsFunc, overloader=self, implements=assists, types=types, dispatch_on=dispatch_on
             )
 
         else:
@@ -457,13 +457,13 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
                 {
                     _get_key(npf): (
                         OverloadUFuncDecorator(
-                            AssistsUFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=npf, methods=ms
+                            AssistsUFunc, overloader=self, dispatch_on=dispatch_on, implements=npf, methods=ms
                         )
                         if isinstance(npf, UFuncLike)
                         else OverloadFuncDecorator(
-                            AssistsFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=npf, types=types
+                            AssistsFunc, overloader=self, dispatch_on=dispatch_on, implements=npf, types=types
                         )
                     )
-                    for npf in numpy_funcs
+                    for npf in assists
                 }
             )
