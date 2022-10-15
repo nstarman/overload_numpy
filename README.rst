@@ -58,8 +58,8 @@ Time to check these work:
 dispatch mechanism in `NEP13
 <https://numpy.org/neps/nep-0013-ufunc-overrides.html>`_ says that  "If one of
 the input or output arguments implements __array_ufunc__, it is executed instead
-of the ufunc." Currently the overloaded :obj:`numpy.add` does not work for any
-of the ``ufunc`` methods.
+of the ufunc." Currently the overloaded ``numpy.add`` does not work for any of
+the ``ufunc`` methods.
 
     >>> try: np.add.accumulate(w1d)
     ... except Exception: print("failed")
