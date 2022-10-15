@@ -1,3 +1,5 @@
+"""Implementations for function overrides."""
+
 ##############################################################################
 # IMPORTS
 
@@ -131,7 +133,7 @@ class OverloadFuncDecorator(Generic[FT]):
 
     @property
     def types(self) -> type | TypeConstraint | Collection[type | TypeConstraint] | None:
-        """`type` | `TypeConstraint` | Collection[`type` | `TypeConstraint`] | None
+        """`type` | `TypeConstraint` | Collection[`type` | `TypeConstraint`] | None.
 
         The types of the arguments of `numpy_func`. See |array_function|_ If
         `None` then ``dispatch_on`` must have class-level attribute
@@ -141,20 +143,17 @@ class OverloadFuncDecorator(Generic[FT]):
 
     @property
     def dispatch_on(self) -> type:
-        """
-        The class type for which the overload implementation is being
-        registered.
-        """
+        """Class type of registrant for overload implementation."""
         return self._dispatch_on
 
     @property
     def numpy_func(self) -> Callable[..., Any]:
-        """The :mod:`numpy` function that is being overloaded."""
+        """Return the :mod:`numpy` function that is being overloaded."""
         return self._numpy_func
 
     @property
     def overloader(self) -> NumPyOverloader:
-        """|NumPyOverloader| instance."""
+        """Instance of |NumPyOverloader|."""
         return self._overloader
 
     def _parse_types(

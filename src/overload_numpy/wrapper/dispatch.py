@@ -1,4 +1,4 @@
-"""`~functools.singledispatch`
+"""`~functools.singledispatch` wrapping for overrides.
 
 .. todo::
 
@@ -53,7 +53,8 @@ class Dispatcher(Generic[WT]):
         self._dspr = dispatcher
 
     def __call__(self, obj: object, /) -> WT:
-        """
+        """Get wrapper for the object's type.
+
         Get correct :mod:`~overload_numpy.wrapper` wrapper for the calling
         object's type.
 
@@ -94,8 +95,9 @@ class Dispatcher(Generic[WT]):
 @final
 @dataclass(frozen=True)
 class DispatchWrapper(Generic[WT]):
-    """
-    `~functools.singledispatch` calls the dispatched functions.
+    """Wrap dispatche to return, not call, the function.
+
+    :func:`~functools.singledispatch` calls the dispatched functions.
     This wraps that function so the single-dispatch instead returns the function.
 
     Parameters

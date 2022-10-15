@@ -195,7 +195,6 @@ def w2b(array: np.ndarray, array2: np.ndarray) -> Wrap2:
 @pytest.mark.parametrize("func", [np.concatenate, np.add, *stack_funcs, *mul_funcs])
 def test_entry(overloader, w1, func):
     """Test current entries."""
-
     # what's registered
     assert func in overloader
     assert f"numpy.{func.__name__}" in overloader.keys()

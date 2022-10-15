@@ -1,4 +1,4 @@
-"""Test :mod:`overload_numpy.mixin`"""
+"""Test :mod:`overload_numpy.mixin`."""
 
 ##############################################################################
 # IMPORTS

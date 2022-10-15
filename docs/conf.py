@@ -21,7 +21,6 @@ def get_authors() -> set[str]:
     set[str]
         The authors.
     """
-
     authors: set[str] = set()
     cfg = pathlib.Path(__file__).parent.parent / "pyproject.toml"
 
@@ -174,7 +173,7 @@ numpydoc_xref_aliases = {
 # This does not *have* to match the package name, but typically does
 project = "overload_numpy"
 author = ", ".join(get_authors())
-copyright = f"{datetime.datetime.now().year}, {author}"
+copyright = f"{datetime.datetime.now().year}, {author}"  # noqa: A001
 
 import_module(project)
 package = sys.modules[project]

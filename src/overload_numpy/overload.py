@@ -1,3 +1,5 @@
+"""|NumPyOverloader|."""
+
 ##############################################################################
 # IMPORTS
 
@@ -105,9 +107,11 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
     """
 
     def __init__(self) -> None:
+        """Initialize for ``dataclass``-decorated subclasses."""
         self.__post_init__()  # initialize this way for `dataclasses.dataclass` subclasses.
 
     def __post_init__(self) -> None:
+        """Create registry of dispatchers."""
         # `_reg` is initialized here for `dataclasses.dataclass` subclasses.
         self._reg: dict[str, All_Dispatchers]
         object.__setattr__(self, "_reg", {})  # compatible with frozen dataclass
@@ -129,12 +133,15 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         return len(self._reg)
 
     def keys(self) -> KeysView[str]:
+        """Return reigstry keys (`str`)."""
         return self._reg.keys()
 
     def values(self) -> ValuesView[All_Dispatchers]:
+        """Return reigstry values (dispatchers)."""
         return self._reg.values()
 
     def items(self) -> ItemsView[str, All_Dispatchers]:
+        """Return reigstry items (str, dispatchers)."""
         return self._reg.items()
 
     # ===============================================================

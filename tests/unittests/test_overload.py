@@ -29,7 +29,7 @@ class Test_NumPyOverloader:
     # Method unit tests
 
     def test_init(self, overloader):
-        """If the fixture passes, so does this"""
+        """If the fixture passes, so does this."""
 
     @pytest.mark.skip(reason="TODO")
     def test___getitem__(self, overloader):

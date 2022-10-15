@@ -1,18 +1,15 @@
+"""Utilities."""
+
 ##############################################################################
 # IMPORTS
 
 from __future__ import annotations
 
 # STDLIB
-from typing import TYPE_CHECKING, Any, Callable, Final, Literal, Set, Union
+from typing import Any, Callable, Final, Literal, Set, Union
 
 # LOCAL
 from overload_numpy._typeutils import UFuncLike
-
-if TYPE_CHECKING:
-    # THIRDPARTY
-    pass
-
 
 __all__: list[str] = []
 

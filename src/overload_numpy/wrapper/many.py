@@ -1,3 +1,6 @@
+"""Implementation of overrides for many functions and |ufunc|."""
+
+
 ##############################################################################
 # IMPORTS
 
@@ -132,12 +135,15 @@ class AssistsManyDecorator(Mapping[str, V]):
         return len(self._decorators)
 
     def keys(self) -> KeysView[str]:
+        """Return functions (str representations) which have overrides."""
         return self._decorators.keys()
 
     def values(self) -> ValuesView[OverloadUFuncDecorator[AssistsUFunc] | OverloadFuncDecorator[AssistsFunc]]:
+        """Return override implementors for functions and |ufunc|."""
         return self._decorators.values()
 
     def items(self) -> ItemsView[str, OverloadUFuncDecorator[AssistsUFunc] | OverloadFuncDecorator[AssistsFunc]]:
+        """Return view of function (str representations) and override implementors."""
         return self._decorators.items()
 
 
@@ -158,7 +164,7 @@ class RegisterManyUFuncMethodDecorator:
     _applicable_methods: frozenset[UFMT]
 
     def __call__(self, assist_ufunc_method: C, /) -> C:
-        """Decorator to register an overload funcction for |ufunc| methods.
+        """Register an overload function for |ufunc| methods.
 
         Parameters
         ----------

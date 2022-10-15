@@ -1,3 +1,5 @@
+"""Implementations for |ufunc| overrides."""
+
 ##############################################################################
 # IMPORTS
 
@@ -11,7 +13,6 @@ from typing import (
     Any,
     Callable,
     Generic,
-    KeysView,
     Mapping,
     TypedDict,
     TypeVar,
@@ -60,8 +61,6 @@ class UFuncMethodOverloadMap(TypedDict):
 class OverrideUFuncBase:
     """Base class to overloading a |func|.
 
-
-
     Parameters
     ----------
     _funcs : dict[str, Callable], positional-only
@@ -74,7 +73,7 @@ class OverrideUFuncBase:
     """
 
     _funcs: UFuncMethodOverloadMap
-    """The overloading function for each :class:`numpy.ufunc` method."""
+    """The overloading function for each |ufunc| method."""
 
     implements: UFuncLike
     """The overloaded |ufunc|."""
@@ -84,20 +83,17 @@ class OverrideUFuncBase:
     `~overload_numpy.wrapper.dispatch.Dispatcher`."""
 
     @property
-    def funcs(self) -> MappingProxyType[str, object]:
-        return MappingProxyType(self._funcs)
-
-    @property
     def __wrapped__(self) -> Callable[..., Any]:
+        """Return the call method override."""
         return self._funcs["__call__"]
 
     @property
-    def methods(self) -> KeysView[str]:
-        """All the |ufunc| methods."""
-        return self._funcs.keys()
+    def methods(self) -> MappingProxyType[str, object]:
+        """Return view of the overloading function for each |ufunc| method."""
+        return MappingProxyType(self._funcs)
 
     def validate_method(self, method: UFMT, /) -> bool:
-        """Validates that the method has an overload.
+        """Validate that the method has an overload.
 
         Parameters
         ----------
@@ -188,7 +184,7 @@ class RegisterUFuncMethodDecorator:
     """|ufunc| methods for which this decorator will register overrides."""
 
     def __call__(self, func: C, /) -> C:
-        """Decorator to register an overload funcction for |ufunc| methods.
+        """Decorate to register an overload funcction for |ufunc| methods.
 
         Parameters
         ----------
@@ -231,7 +227,7 @@ class OverloadUFuncDecorator(Generic[UT]):
     overloader: NumPyOverloader
 
     def __post_init__(self) -> None:
-        # Make single-dispatcher for numpy function
+        """Make single-dispatcher for numpy function."""
         key = _get_key(self.numpy_func)
         if key not in self.overloader._reg:
             self.overloader._reg[key] = Dispatcher[UT]()
