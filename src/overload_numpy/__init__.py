@@ -1,3 +1,5 @@
+r"""Package for easy implementation of NEP13 and NEP18 interoperable objects."""
+
 # LOCAL
 from overload_numpy import constraints
 from overload_numpy.mixin import (

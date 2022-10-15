@@ -70,8 +70,8 @@ else:
     print("BUILDING `overload_numpy` WITH MYPYC")
 
     blocklist = [  # TODO!
-        "overload_numpy/wrapper/dispatch.py",  # https://github.com/python/mypy/issues/13613
-        "overload_numpy/wrapper/ufunc.py",  # FIXME: can't call ImplementsUFunc
+        "overload_numpy/implementors/dispatch.py",  # https://github.com/python/mypy/issues/13613
+        "overload_numpy/implementors/ufunc.py",  # FIXME: can't call ImplementsUFunc
         "overload_numpy/_typeutils.py",  # https://github.com/mypyc/mypyc/issues/909
     ]
     discovered: list[Path] = []

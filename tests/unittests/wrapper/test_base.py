@@ -9,8 +9,8 @@ import pytest
 
 # LOCAL
 from overload_numpy import NumPyOverloader
+from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import _get_key
-from overload_numpy.wrapper.dispatch import Dispatcher
 
 ##############################################################################
 # TESTS

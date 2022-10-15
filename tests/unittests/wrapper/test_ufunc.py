@@ -6,8 +6,8 @@ import pytest
 
 # LOCAL
 from .test_base import OverloadDecoratorBase_Test, OverloadWrapperBase_Test
-from overload_numpy.wrapper.dispatch import DispatchWrapper
-from overload_numpy.wrapper.ufunc import OverloadUFuncDecoratorBase
+from overload_numpy.implementors.dispatch import DispatchWrapper
+from overload_numpy.implementors.ufunc import OverloadUFuncDecorator
 
 ##############################################################################
 # TESTS
@@ -18,14 +18,14 @@ class OverrideUFuncBase_Test(OverloadWrapperBase_Test):
     pass
 
 
-class OverloadUFuncDecoratorBase_Test(OverloadDecoratorBase_Test):
+class OverloadUFuncDecorator_Test(OverloadDecoratorBase_Test):
     @pytest.fixture(scope="class")
     def OverrideCls(self):
         return object
 
     @pytest.fixture(scope="class")
     def decorator_cls(self):
-        return OverloadUFuncDecoratorBase
+        return OverloadUFuncDecorator
 
     @pytest.fixture(scope="class")
     def types(self):
@@ -66,7 +66,7 @@ class Test_ImplementsUFunc(OverrideUFuncBase_Test):
 
 
 @pytest.mark.skip(reason="TODO")
-class Test_ImplementsUFuncDecorator(OverloadUFuncDecoratorBase_Test):
+class Test_ImplementsUFuncDecorator(OverloadUFuncDecorator_Test):
     pass
 
 
@@ -79,5 +79,5 @@ class Test_AssistsUFunc(OverrideUFuncBase_Test):
 
 
 @pytest.mark.skip(reason="TODO")
-class Test_AssistsUFuncDecorator(OverloadUFuncDecoratorBase_Test):
+class Test_OverloadUFuncDecorator(OverloadUFuncDecorator_Test):
     pass

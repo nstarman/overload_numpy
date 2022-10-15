@@ -9,11 +9,10 @@ from copy import copy, deepcopy
 import pytest
 
 # LOCAL
-from overload_numpy.wrapper.dispatch import Dispatcher
+from overload_numpy.implementors.dispatch import Dispatcher
 
 ##############################################################################
 # TESTS
-# \
 
 
 class Test_Dispatcher:

@@ -1,3 +1,6 @@
+"""Implementation of overrides for many functions and |ufunc|."""
+
+
 ##############################################################################
 # IMPORTS
 
@@ -6,16 +9,22 @@ from __future__ import annotations
 # STDLIB
 import itertools
 from dataclasses import dataclass
-from typing import Any, Callable, TypeVar
+from typing import (
+    Any,
+    Callable,
+    ItemsView,
+    Iterator,
+    KeysView,
+    Mapping,
+    TypeVar,
+    Union,
+    ValuesView,
+)
 
 # LOCAL
-from overload_numpy.utils import UFMT, UFMsT, _parse_methods
-from overload_numpy.wrapper.func import AssistsFuncDecorator
-from overload_numpy.wrapper.ufunc import (
-    AssistsUFunc,
-    AssistsUFuncDecorator,
-    ImplementsUFunc,
-)
+from overload_numpy.implementors.func import AssistsFunc, OverloadFuncDecorator
+from overload_numpy.implementors.ufunc import AssistsUFunc, OverloadUFuncDecorator
+from overload_numpy.utils import UFMT, UFMsT, _get_key, _parse_methods
 
 __all__: list[str] = []
 
@@ -24,6 +33,7 @@ __all__: list[str] = []
 
 C = TypeVar("C", bound=Callable[..., Any])
 Self = TypeVar("Self", bound="AssistsManyDecorator")
+V = Union[OverloadUFuncDecorator[AssistsUFunc], OverloadFuncDecorator[AssistsFunc]]
 
 
 ##############################################################################
@@ -31,8 +41,8 @@ Self = TypeVar("Self", bound="AssistsManyDecorator")
 ##############################################################################
 
 
-@dataclass(frozen=True)
-class AssistsManyDecorator:
+# @dataclass(frozen=True)  # todo when mypyc happy
+class AssistsManyDecorator(Mapping[str, V]):
     """Class for registering `~overload_numpy.NumPyOverloader.assists` (u)funcs.
 
     .. warning::
@@ -44,22 +54,17 @@ class AssistsManyDecorator:
 
     Parameters
     ----------
-    _decorators : tuple[AssistsFuncDecorator | AssistsUFuncDecorator, ...]
-        `tuple` of ``AssistsFuncDecorator | AssistsUFuncDecorator``.
+    _decorators : dict[str, OverloadFuncDecorator | OverloadUFuncDecorator]
+        :class:`dict` of ``OverloadFuncDecorator[AssistsFunc] |
+        OverloadUFuncDecorator[AssistsUFunc]``.
     """
 
-    _decorators: tuple[AssistsUFuncDecorator | AssistsFuncDecorator, ...]
-    """`tuple` of ``AssistsFuncDecorator | AssistsUFuncDecorator``."""
+    def __init__(self, decorators: dict[str, V], /) -> None:
+        self._decorators = decorators
 
-    def __post_init__(self) -> None:
-        self.ufunc_wrappers: tuple[ImplementsUFunc | AssistsUFunc, ...] | None
-        object.__setattr__(self, "ufunc_wrappers", None)  # set in `__call__`
-
-        self.__wrapped__: Callable[..., Any]
-        object.__setattr__(self, "__wrapped__", None)  # set in `__call__`
-
-        self._is_set: bool
-        object.__setattr__(self, "_is_set", False)  # set in `__call__`
+        self._ufunc_wrappers: dict[str, AssistsUFunc] = {}  # set in `__call__`
+        self.__wrapped__: Callable[..., Any] | None = None  # set in `__call__`
+        self._is_set: bool = False  # set in `__call__`
 
     def __call__(self: Self, assists_func: Callable[..., Any], /) -> Self:
         """Register ``assists_func`` with for all overloads.
@@ -78,25 +83,24 @@ class AssistsManyDecorator:
         if self._is_set:
             raise ValueError("AssistsManyDecorator can only be called once")
 
-        object.__setattr__(self, "__wrapped__", assists_func)
+        self.__wrapped__ = assists_func
 
         # Iterate through, evaluating the contained decorator. Just evaluating
         # the decorator is enough to activate it. We separate funcs and ufuncs,
         # because the latter are kept in attr ``ufunc_wrappers``.
-        # for dec in (d for d in self.decorators if isinstance(d, AssistsFuncDecorator)):  # NOTE: mypyc incompatible
-        for dec in self._decorators:
-            if not isinstance(dec, AssistsFuncDecorator):
+        for dec in self._decorators.values():
+            if not isinstance(dec, OverloadFuncDecorator):
                 continue
             dec(assists_func)
 
-        ufws = tuple(dec(assists_func) for dec in self._decorators if isinstance(dec, AssistsUFuncDecorator))
-        object.__setattr__(self, "ufunc_wrappers", ufws)
+        ufws = {k: dec(assists_func) for k, dec in self._decorators.items() if isinstance(dec, OverloadUFuncDecorator)}
+        self._ufunc_wrappers = ufws
 
-        object.__setattr__(self, "_is_set", True)  # prevent re-calling
+        self._is_set = True  # prevent re-calling
         return self
 
     def register(self, methods: UFMsT, /) -> RegisterManyUFuncMethodDecorator:
-        """Register overload for |ufunc| methods.
+        """Register override for |ufunc| methods.
 
         Parameters
         ----------
@@ -110,11 +114,37 @@ class AssistsManyDecorator:
             Decorator to register a function as an overload for a |ufunc| method
             (or set thereof).
         """
-        ufws = self.ufunc_wrappers
-        if ufws is None:
+        if self._is_set is False:
             raise ValueError("need to call this decorator first")
 
-        return RegisterManyUFuncMethodDecorator(ufws, _parse_methods(methods))
+        return RegisterManyUFuncMethodDecorator(self._ufunc_wrappers, _parse_methods(methods))
+
+    # ===============================================================
+    # Mapping
+
+    def __getitem__(self, key: str | Callable[..., Any], /) -> V:
+        return self._decorators[_get_key(key)]
+
+    def __contains__(self, o: object, /) -> bool:
+        return _get_key(o) in self._decorators
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._decorators)
+
+    def __len__(self) -> int:
+        return len(self._decorators)
+
+    def keys(self) -> KeysView[str]:
+        """Return functions (str representations) which have overrides."""
+        return self._decorators.keys()
+
+    def values(self) -> ValuesView[OverloadUFuncDecorator[AssistsUFunc] | OverloadFuncDecorator[AssistsFunc]]:
+        """Return override implementors for functions and |ufunc|."""
+        return self._decorators.values()
+
+    def items(self) -> ItemsView[str, OverloadUFuncDecorator[AssistsUFunc] | OverloadFuncDecorator[AssistsFunc]]:
+        """Return view of function (str representations) and override implementors."""
+        return self._decorators.items()
 
 
 @dataclass(frozen=True)
@@ -130,14 +160,11 @@ class RegisterManyUFuncMethodDecorator:
         registered. Users should not make an instance of this class.
     """
 
-    _ufunc_wrappers: tuple[ImplementsUFunc | AssistsUFunc, ...]
-    """`tuple` of ``AssistsFuncDecorator | AssistsUFuncDecorator``."""
-
+    _ufunc_wrappers: dict[str, AssistsUFunc]
     _applicable_methods: frozenset[UFMT]
-    """|ufunc| methods for which this decorator will register overrides."""
 
     def __call__(self, assist_ufunc_method: C, /) -> C:
-        """Decorator to register an overload funcction for |ufunc| methods.
+        """Register an overload function for |ufunc| methods.
 
         Parameters
         ----------
@@ -149,6 +176,6 @@ class RegisterManyUFuncMethodDecorator:
         func : Callable[..., Any]
             Unchanged.
         """
-        for ufw, m in itertools.product(self._ufunc_wrappers, self._applicable_methods):
+        for ufw, m in itertools.product(self._ufunc_wrappers.values(), self._applicable_methods):
             ufw._funcs[m] = assist_ufunc_method
         return assist_ufunc_method

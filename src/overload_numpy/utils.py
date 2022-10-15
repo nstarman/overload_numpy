@@ -1,18 +1,15 @@
+"""Utilities."""
+
 ##############################################################################
 # IMPORTS
 
 from __future__ import annotations
 
 # STDLIB
-from typing import TYPE_CHECKING, Any, Callable, Final, Literal, Set, TypedDict, Union
+from typing import Any, Callable, Final, Literal, Set, Union
 
 # LOCAL
 from overload_numpy._typeutils import UFuncLike
-
-if TYPE_CHECKING:
-    # THIRDPARTY
-    from typing_extensions import NotRequired
-
 
 __all__: list[str] = []
 
@@ -35,17 +32,6 @@ VALID_UFUNC_METHODS: Final[set[UFMT]] = {
     "reduce",
     "reduceat",
 }
-
-
-class UFuncMethodOverloadMap(TypedDict):
-    """Dictionary of |ufunc| method key (str) to the method overload (func)."""
-
-    __call__: Callable[..., Any]
-    at: NotRequired[Callable[..., Any]]
-    accumulate: NotRequired[Callable[..., Any]]
-    outer: NotRequired[Callable[..., Any]]
-    reduce: NotRequired[Callable[..., Any]]
-    reduceat: NotRequired[Callable[..., Any]]
 
 
 ##############################################################################

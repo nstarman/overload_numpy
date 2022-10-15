@@ -22,22 +22,29 @@ class UFuncLike(Protocol):
 
     @property
     def __name__(self) -> str:
+        """Class name."""
         ...
 
     def __call__(self, /, *args: Any, **kwargs: Any) -> Any:
+        """Call method of |ufunc|."""
         ...
 
     def at(self, a: Any, indices: Any, b: Any, /) -> Any:
+        """|ufunc| ``at`` method."""
         ...
 
     def accumulate(self, array: Any, axis: Any, dtype: Any, out: Any) -> Any:
+        """|ufunc| ``accumulate`` method."""
         ...
 
     def outer(self, A: Any, B: Any, /, **kwargs: Any) -> Any:
+        """|ufunc| ``outer`` method."""
         ...
 
     def reduce(self, array: Any, axis: Any, dtype: Any, out: Any, keepdims: Any, initial: Any, where: Any) -> Any:
+        """|ufunc| ``reduce`` method."""
         ...
 
     def reduceat(self, array: Any, indices: Any, axis: Any, dtype: Any, out: Any) -> Any:
+        """|ufunc| ``reduceat`` method."""
         ...
