@@ -22,8 +22,8 @@ from typing import (
 
 # LOCAL
 from overload_numpy._typeutils import UFuncLike
+from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import UFMsT, _get_key, _parse_methods
-from overload_numpy.wrapper.dispatch import Dispatcher
 
 if TYPE_CHECKING:
     # STDLIB
@@ -32,14 +32,14 @@ if TYPE_CHECKING:
 
     # LOCAL
     from overload_numpy.constraints import TypeConstraint
-    from overload_numpy.wrapper.dispatch import All_Dispatchers
-    from overload_numpy.wrapper.func import (
+    from overload_numpy.implementors.dispatch import All_Dispatchers
+    from overload_numpy.implementors.func import (
         AssistsFunc,
         ImplementsFunc,
         OverloadFuncDecorator,
     )
-    from overload_numpy.wrapper.many import AssistsManyDecorator
-    from overload_numpy.wrapper.ufunc import (
+    from overload_numpy.implementors.many import AssistsManyDecorator
+    from overload_numpy.implementors.ufunc import (
         AssistsUFunc,
         ImplementsUFunc,
         OverloadUFuncDecorator,
@@ -252,7 +252,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         """
         if isinstance(numpy_func, UFuncLike):
             # LOCAL
-            from overload_numpy.wrapper.ufunc import (
+            from overload_numpy.implementors.ufunc import (
                 ImplementsUFunc,
                 OverloadUFuncDecorator,
             )
@@ -267,7 +267,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
         else:
             # LOCAL
-            from overload_numpy.wrapper.func import (
+            from overload_numpy.implementors.func import (
                 ImplementsFunc,
                 OverloadFuncDecorator,
             )
@@ -417,7 +417,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         """
         if isinstance(numpy_funcs, UFuncLike):
             # LOCAL
-            from overload_numpy.wrapper.ufunc import (
+            from overload_numpy.implementors.ufunc import (
                 AssistsUFunc,
                 OverloadUFuncDecorator,
             )
@@ -430,7 +430,10 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
         elif callable(numpy_funcs):
             # LOCAL
-            from overload_numpy.wrapper.func import AssistsFunc, OverloadFuncDecorator
+            from overload_numpy.implementors.func import (
+                AssistsFunc,
+                OverloadFuncDecorator,
+            )
 
             # `methods` is ignored for funcs
             return OverloadFuncDecorator(
@@ -439,9 +442,12 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
         else:
             # LOCAL
-            from overload_numpy.wrapper.func import AssistsFunc, OverloadFuncDecorator
-            from overload_numpy.wrapper.many import AssistsManyDecorator
-            from overload_numpy.wrapper.ufunc import (
+            from overload_numpy.implementors.func import (
+                AssistsFunc,
+                OverloadFuncDecorator,
+            )
+            from overload_numpy.implementors.many import AssistsManyDecorator
+            from overload_numpy.implementors.ufunc import (
                 AssistsUFunc,
                 OverloadUFuncDecorator,
             )

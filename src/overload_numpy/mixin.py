@@ -196,8 +196,8 @@ from typing import TYPE_CHECKING, Any, Callable, ClassVar, Collection
 from mypy_extensions import mypyc_attr, trait
 
 # LOCAL
-from overload_numpy.wrapper.func import AssistsFunc, ImplementsFunc
-from overload_numpy.wrapper.ufunc import AssistsUFunc, ImplementsUFunc
+from overload_numpy.implementors.func import AssistsFunc, ImplementsFunc
+from overload_numpy.implementors.ufunc import AssistsUFunc, ImplementsUFunc
 
 if TYPE_CHECKING:
     # LOCAL

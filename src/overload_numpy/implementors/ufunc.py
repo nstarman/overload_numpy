@@ -20,8 +20,8 @@ from typing import (
 )
 
 # LOCAL
+from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import UFMT, UFMsT, _get_key, _parse_methods
-from overload_numpy.wrapper.dispatch import Dispatcher
 
 if TYPE_CHECKING:
     # THIRDPARTY

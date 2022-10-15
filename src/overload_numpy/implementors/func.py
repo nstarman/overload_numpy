@@ -15,8 +15,8 @@ from mypy_extensions import trait
 
 # LOCAL
 from overload_numpy.constraints import Covariant, TypeConstraint
+from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import _get_key
-from overload_numpy.wrapper.dispatch import Dispatcher
 
 if TYPE_CHECKING:
     # LOCAL

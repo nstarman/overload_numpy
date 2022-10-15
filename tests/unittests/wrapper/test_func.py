@@ -7,8 +7,8 @@ import pytest
 
 # LOCAL
 from .test_base import OverloadDecoratorBase_Test, OverloadWrapperBase_Test
-from overload_numpy.wrapper.dispatch import DispatchWrapper
-from overload_numpy.wrapper.func import (
+from overload_numpy.implementors.dispatch import DispatchWrapper
+from overload_numpy.implementors.func import (
     AssistsFunc,
     ImplementsFunc,
     OverloadFuncDecorator,

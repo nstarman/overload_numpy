@@ -22,9 +22,9 @@ from typing import (
 )
 
 # LOCAL
+from overload_numpy.implementors.func import AssistsFunc, OverloadFuncDecorator
+from overload_numpy.implementors.ufunc import AssistsUFunc, OverloadUFuncDecorator
 from overload_numpy.utils import UFMT, UFMsT, _get_key, _parse_methods
-from overload_numpy.wrapper.func import AssistsFunc, OverloadFuncDecorator
-from overload_numpy.wrapper.ufunc import AssistsUFunc, OverloadUFuncDecorator
 
 __all__: list[str] = []
 
