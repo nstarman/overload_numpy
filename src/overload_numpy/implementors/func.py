@@ -96,10 +96,10 @@ class OverloadFuncDecorator(Generic[FT]):
     dispatch_on : type, keyword-only
         The class type for which the overload implementation is being
         registered.
-    numpy_func : Callable[..., Any], keyword-only
+    implements : Callable[..., Any], keyword-only
         The :mod:`numpy` function that is being overloaded.
     types : type or TypeConstraint or Collection thereof or None, keyword-only
-        The types of the arguments of `numpy_func`. See |array_function|_ If
+        The types of the arguments of ``implements``. See |array_function|_ If
         `None` then ``dispatch_on`` must have class-level attribute
         ``NP_FUNC_TYPES`` specifying the types.
     overloader : |NumPyOverloader|, keyword-only
@@ -114,20 +114,20 @@ class OverloadFuncDecorator(Generic[FT]):
         override_cls: type[ImplementsFunc] | type[AssistsFunc],
         *,
         dispatch_on: type,
-        numpy_func: Callable[..., Any],
+        implements: Callable[..., Any],
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
         overloader: NumPyOverloader,
     ) -> None:
         self._override_cls = override_cls
         self._types = types
         self._dispatch_on = dispatch_on
-        self._numpy_func = numpy_func
+        self._implements = implements
         self._overloader = overloader
         self.__post_init__()
 
     def __post_init__(self) -> None:
         # Make single-dispatcher for numpy function
-        key = _get_key(self.numpy_func)
+        key = _get_key(self.implements)
         if key not in self.overloader._reg:
             self.overloader._reg[key] = Dispatcher[FT]()
 
@@ -135,7 +135,7 @@ class OverloadFuncDecorator(Generic[FT]):
     def types(self) -> type | TypeConstraint | Collection[type | TypeConstraint] | None:
         """`type` | `TypeConstraint` | Collection[`type` | `TypeConstraint`] | None.
 
-        The types of the arguments of `numpy_func`. See |array_function|_ If
+        The types of the arguments of `implements`. See |array_function|_ If
         `None` then ``dispatch_on`` must have class-level attribute
         ``NP_FUNC_TYPES`` specifying the types.
         """
@@ -147,9 +147,9 @@ class OverloadFuncDecorator(Generic[FT]):
         return self._dispatch_on
 
     @property
-    def numpy_func(self) -> Callable[..., Any]:
+    def implements(self) -> Callable[..., Any]:
         """Return the :mod:`numpy` function that is being overloaded."""
-        return self._numpy_func
+        return self._implements
 
     @property
     def overloader(self) -> NumPyOverloader:
@@ -221,7 +221,7 @@ class OverloadFuncDecorator(Generic[FT]):
         Parameters
         ----------
         func : Callable[..., Any]
-            The overloading function for ``numpy_func``.
+            The overloading function for ``implements``.
 
         Returns
         -------
@@ -242,10 +242,10 @@ class OverloadFuncDecorator(Generic[FT]):
         types = self._parse_types(self.types, self.dispatch_on)
 
         # Adding a new numpy function
-        info = self._override_cls(func=func, types=types, implements=self.numpy_func, dispatch_on=self.dispatch_on)
+        info = self._override_cls(func=func, types=types, implements=self.implements, dispatch_on=self.dispatch_on)
 
         # Register the function
-        self.overloader[self.numpy_func].register(self.dispatch_on, info)
+        self.overloader[self.implements].register(self.dispatch_on, info)
         return func
 
 
@@ -355,7 +355,7 @@ class AssistsFunc(ValidatesType):
 
     Has signature::
 
-        func(calling_type: type, numpy_func: FunctionType, *args, **kwargs)
+        func(calling_type: type, implements: FunctionType, *args, **kwargs)
     """
 
     # TODO! when py3.10+ add NotImplemented
