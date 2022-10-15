@@ -8,14 +8,18 @@ import pytest
 # LOCAL
 from .test_base import OverloadDecoratorBase_Test, OverloadWrapperBase_Test
 from overload_numpy.wrapper.dispatch import DispatchWrapper
-from overload_numpy.wrapper.func import OverloadFuncDecoratorBase
+from overload_numpy.wrapper.func import (
+    AssistsFunc,
+    ImplementsFunc,
+    OverloadFuncDecorator,
+)
 
 ##############################################################################
 # TESTS
 ##############################################################################
 
 
-class OverloadFuncDecoratorBase_Test(OverloadDecoratorBase_Test):
+class OverloadFuncDecorator_Test(OverloadDecoratorBase_Test):
     @pytest.fixture(scope="class")
     def numpy_func(self):
         return np.concatenate
@@ -25,13 +29,13 @@ class OverloadFuncDecoratorBase_Test(OverloadDecoratorBase_Test):
         def concatenate(objs, *args, **kwargs):
             return "custom"
 
-    @pytest.fixture(scope="class")
-    def OverrideCls(self):
-        return object
+    @pytest.fixture(scope="class", params=[ImplementsFunc, AssistsFunc])
+    def OverrideCls(self, request):
+        return request.param
 
     @pytest.fixture(scope="class")
     def decorator_cls(self):
-        return OverloadFuncDecoratorBase
+        return OverloadFuncDecorator
 
     @pytest.fixture(scope="class")
     def types(self):
@@ -71,11 +75,6 @@ class Test_ImplementsFunc(OverloadWrapperBase_Test):
     pass
 
 
-@pytest.mark.skip(reason="TODO")
-class Test_ImplementsFuncDecorator(OverloadFuncDecoratorBase_Test):
-    pass
-
-
 ##############################################################################
 
 
@@ -85,5 +84,5 @@ class Test_AssistsFunc(OverloadWrapperBase_Test):
 
 
 @pytest.mark.skip(reason="TODO")
-class Test_AssistsFuncDecorator(OverloadFuncDecoratorBase_Test):
+class Test_OverloadFuncDecorator(OverloadFuncDecorator_Test):
     pass

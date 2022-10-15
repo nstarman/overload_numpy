@@ -6,7 +6,7 @@ from __future__ import annotations
 # STDLIB
 from collections.abc import Collection
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, Mapping, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Final, Generic, Mapping, TypeVar
 
 # THIRDPARTY
 from mypy_extensions import trait
@@ -84,7 +84,7 @@ class ValidatesType:
 
 
 # @dataclass(frozen=True)  # TODO: when https://github.com/python/mypy/issues/13304 fixed
-class OverloadFuncDecoratorBase(Generic[FT]):
+class OverloadFuncDecorator(Generic[FT]):
     """Decorator base class for registering an |array_function|_ overload.
 
     Instances of this class should not be used directly.
@@ -104,17 +104,19 @@ class OverloadFuncDecoratorBase(Generic[FT]):
         Overloader instance.
     """
 
-    OverrideCls: ClassVar[type]  # ImplementsFunc | AssistsFunc
+    _override_cls: Final[type[ImplementsFunc] | type[AssistsFunc]]
 
     # TODO: rm when https://github.com/python/mypy/issues/13304 fixed
     def __init__(
         self,
+        override_cls: type[ImplementsFunc] | type[AssistsFunc],
         *,
         dispatch_on: type,
         numpy_func: Callable[..., Any],
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
         overloader: NumPyOverloader,
     ) -> None:
+        self._override_cls = override_cls
         self._types = types
         self._dispatch_on = dispatch_on
         self._numpy_func = numpy_func
@@ -241,7 +243,7 @@ class OverloadFuncDecoratorBase(Generic[FT]):
         types = self._parse_types(self.types, self.dispatch_on)
 
         # Adding a new numpy function
-        info = self.OverrideCls(func=func, types=types, implements=self.numpy_func, dispatch_on=self.dispatch_on)
+        info = self._override_cls(func=func, types=types, implements=self.numpy_func, dispatch_on=self.dispatch_on)
 
         # Register the function
         self.overloader[self.numpy_func].register(self.dispatch_on, info)
@@ -315,30 +317,6 @@ class ImplementsFunc(ValidatesType):
         return self.func(*args, **kwargs)
 
 
-# @dataclass(frozen=True)  # TODO: when https://github.com/python/mypy/issues/13304 fixed
-class ImplementsFuncDecorator(OverloadFuncDecoratorBase[ImplementsFunc]):
-    """Decorator for registering with |NumPyOverloader|.
-
-    Instances of this class should not be used directly.
-
-    Parameters
-    ----------
-    overloader : |NumPyOverloader|, keyword-only
-        Overloader instance.
-    dispatch_on : type, keyword-only
-        The class type for which the overload implementation is being
-        registered.
-    numpy_func : Callable[..., Any], keyword-only
-        The :mod:`numpy` function that is being overloaded.
-    types : type or TypeConstraint or Collection thereof or None, keyword-only
-        The types of the arguments of `numpy_func`. See |array_function|_ If
-        `None` then ``dispatch_on`` must have class-level attribute
-        ``NP_FUNC_TYPES`` specifying the types.
-    """
-
-    OverrideCls: ClassVar[type[ImplementsFunc]] = ImplementsFunc
-
-
 # ============================================================================
 
 
@@ -407,27 +385,3 @@ class AssistsFunc(ValidatesType):
             The result of evaluating the |numpy| function method.
         """
         return self.func(calling_type, self.implements, *args, **kwargs)
-
-
-# @dataclass(frozen=True)  # TODO: when https://github.com/python/mypy/issues/13304 fixed
-class AssistsFuncDecorator(OverloadFuncDecoratorBase[AssistsFunc]):
-    """Decorator for registering with |NumPyOverloader|.
-
-    Instances of this class should not be used directly.
-
-    Parameters
-    ----------
-    overloader : |NumPyOverloader|, keyword-only
-        Overloader instance.
-    numpy_func : Callable[..., Any], keyword-only
-        The :mod:`numpy` function that is being overloaded.
-    types : type or TypeConstraint or Collection thereof or None, keyword-only
-        The types of the arguments of `numpy_func`. See |array_function|_ If
-        `None` then ``dispatch_on`` must have class-level attribute
-        ``NP_FUNC_TYPES`` specifying the types.
-    dispatch_on : type, keyword-only
-        The class type for which the overload implementation is being
-        registered.
-    """
-
-    OverrideCls: ClassVar[type[AssistsFunc]] = AssistsFunc

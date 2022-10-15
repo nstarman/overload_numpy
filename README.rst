@@ -6,8 +6,9 @@ Overload ``NumPy`` ufuncs and functions
     |PyPI status| |coverage status| |RTD status| |black status| |pre-commit status|
 
 
-``overload_numpy`` provides easy-to-use tools for working with ``NumPy``'s ``__array_(u)func(tion)__``.
-The library is fully typed and wheels are compiled with mypyc.
+``overload_numpy`` provides easy-to-use tools for working with ``NumPy``'s
+``__array_(u)func(tion)__``. The library is fully typed and wheels are compiled
+with mypyc.
 
 
 Implementing an Overload
@@ -20,7 +21,7 @@ First, some imports:
     >>> import numpy as np
     >>> from overload_numpy import NumPyOverloader, NPArrayOverloadMixin
 
-Now we can define a |NumPyOverloader| instance:
+Now we can define a ``NumPyOverloader`` instance:
 
     >>> W_FUNCS = NumPyOverloader()
 
@@ -34,9 +35,8 @@ The overloads apply to an array wrapping class. Let's define one:
 
     >>> w1d = Wrap1D(np.arange(3))
 
-Now both :class:`numpy.ufunc` (e.g. :obj:`numpy.add`) and :mod:`numpy` functions
-(e.g. :func:`numpy.concatenate`) can be overloaded and registered for
-``Wrap1D``.
+Now both ``numpy.ufunc`` (e.g. ``numpy.add``) and ``numpy`` functions (e.g.
+``numpy.concatenate``) can be overloaded and registered for ``Wrap1D``.
 
     >>> @W_FUNCS.implements(np.add, Wrap1D)
     ... def add(w1, w2):
@@ -54,18 +54,18 @@ Time to check these work:
     >>> np.concatenate((w1d, w1d))
     Wrap1D(x=array([0, 1, 2, 0, 1, 2]))
 
-|ufunc| also have a number of methods: 'at', 'accumulate', etc. The function
+``ufunc`` also have a number of methods: 'at', 'accumulate', etc. The function
 dispatch mechanism in `NEP13
 <https://numpy.org/neps/nep-0013-ufunc-overrides.html>`_ says that  "If one of
 the input or output arguments implements __array_ufunc__, it is executed instead
 of the ufunc." Currently the overloaded :obj:`numpy.add` does not work for any
-of the |ufunc| methods.
+of the ``ufunc`` methods.
 
     >>> try: np.add.accumulate(w1d)
     ... except Exception: print("failed")
     failed
 
-|ufunc| method overloads can be registered on the wrapped ``add``
+``ufunc`` method overloads can be registered on the wrapped ``add``
 implementation:
 
     >>> @add.register('accumulate')
@@ -85,10 +85,10 @@ What if we defined a subclass of ``Wrap1D``?
     ...     '''A simple 2-array wrapper.'''
     ...     y: np.ndarray
 
-The overload for :func:`numpy.concatenate` registered on ``Wrap1D`` will not
-work correctly for ``Wrap2D``. However, |NumPyOverloader| supports
-single-dispatch on the calling type for the overload, so overloads can be
-customized for subclasses.
+The overload for ``numpy.concatenate`` registered on ``Wrap1D`` will not work
+correctly for ``Wrap2D``. However, ``NumPyOverloader`` supports single-dispatch
+on the calling type for the overload, so overloads can be customized for
+subclasses.
 
     >>> @W_FUNCS.implements(np.add, Wrap2D)
     ... def add(w1, w2):

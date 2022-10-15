@@ -10,6 +10,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Collection,
+    ItemsView,
     Iterator,
     KeysView,
     Mapping,
@@ -31,13 +32,15 @@ if TYPE_CHECKING:
     from overload_numpy.constraints import TypeConstraint
     from overload_numpy.wrapper.dispatch import All_Dispatchers
     from overload_numpy.wrapper.func import (
-        AssistsFuncDecorator,
-        ImplementsFuncDecorator,
+        AssistsFunc,
+        ImplementsFunc,
+        OverloadFuncDecorator,
     )
     from overload_numpy.wrapper.many import AssistsManyDecorator
     from overload_numpy.wrapper.ufunc import (
-        AssistsUFuncDecorator,
-        ImplementsUFuncDecorator,
+        AssistsUFunc,
+        ImplementsUFunc,
+        OverloadUFuncDecorator,
     )
 
 
@@ -131,6 +134,9 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
     def values(self) -> ValuesView[All_Dispatchers]:
         return self._reg.values()
 
+    def items(self) -> ItemsView[str, All_Dispatchers]:
+        return self._reg.items()
+
     # ===============================================================
 
     @overload
@@ -142,7 +148,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
         methods: UFMsT = "__call__",
-    ) -> ImplementsUFuncDecorator:
+    ) -> OverloadUFuncDecorator[ImplementsUFunc]:
         ...
 
     @overload
@@ -154,7 +160,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
         methods: UFMsT = "__call__",
-    ) -> ImplementsFuncDecorator:
+    ) -> OverloadFuncDecorator[ImplementsFunc]:
         ...
 
     def implements(
@@ -165,7 +171,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
         methods: UFMsT = "__call__",
-    ) -> ImplementsUFuncDecorator | ImplementsFuncDecorator:
+    ) -> OverloadUFuncDecorator[ImplementsUFunc] | OverloadFuncDecorator[ImplementsFunc]:
         """
         Register an |array_function|_ implementation object.
 
@@ -239,19 +245,29 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         """
         if isinstance(numpy_func, UFuncLike):
             # LOCAL
-            from overload_numpy.wrapper.ufunc import ImplementsUFuncDecorator
+            from overload_numpy.wrapper.ufunc import (
+                ImplementsUFunc,
+                OverloadUFuncDecorator,
+            )
 
             if types is not None:
                 raise ValueError(f"when implementing a ufunc, types must be None, not {types}")
 
             ms = _parse_methods(methods)
-            return ImplementsUFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, methods=ms)
+            return OverloadUFuncDecorator(
+                ImplementsUFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, methods=ms
+            )
 
         else:
             # LOCAL
-            from overload_numpy.wrapper.func import ImplementsFuncDecorator
+            from overload_numpy.wrapper.func import (
+                ImplementsFunc,
+                OverloadFuncDecorator,
+            )
 
-            return ImplementsFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, types=types)
+            return OverloadFuncDecorator(
+                ImplementsFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_func, types=types
+            )
 
     # ---------------------------------------------------------------
 
@@ -264,7 +280,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
         methods: UFMsT,
-    ) -> AssistsUFuncDecorator:
+    ) -> OverloadUFuncDecorator[AssistsUFunc]:
         ...
 
     @overload
@@ -276,7 +292,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
         methods: UFMsT,
-    ) -> AssistsFuncDecorator:
+    ) -> OverloadFuncDecorator[AssistsFunc]:
         ...
 
     @overload
@@ -299,7 +315,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
         methods: UFMsT = "__call__",
-    ) -> AssistsUFuncDecorator | AssistsFuncDecorator | AssistsManyDecorator:
+    ) -> OverloadFuncDecorator[AssistsFunc] | OverloadUFuncDecorator[AssistsUFunc] | AssistsManyDecorator:
         """
         Register an |array_function|_ assistance function.
 
@@ -394,33 +410,47 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         """
         if isinstance(numpy_funcs, UFuncLike):
             # LOCAL
-            from overload_numpy.wrapper.ufunc import AssistsUFuncDecorator
+            from overload_numpy.wrapper.ufunc import (
+                AssistsUFunc,
+                OverloadUFuncDecorator,
+            )
 
             # `types` is ignored for ufuncs
             ms = _parse_methods(methods)
-            return AssistsUFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_funcs, methods=ms)
+            return OverloadUFuncDecorator(
+                AssistsUFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=numpy_funcs, methods=ms
+            )
 
         elif callable(numpy_funcs):
             # LOCAL
-            from overload_numpy.wrapper.func import AssistsFuncDecorator
+            from overload_numpy.wrapper.func import AssistsFunc, OverloadFuncDecorator
 
             # `methods` is ignored for funcs
-            return AssistsFuncDecorator(overloader=self, numpy_func=numpy_funcs, types=types, dispatch_on=dispatch_on)
+            return OverloadFuncDecorator(
+                AssistsFunc, overloader=self, numpy_func=numpy_funcs, types=types, dispatch_on=dispatch_on
+            )
 
         else:
             # LOCAL
-            from overload_numpy.wrapper.func import AssistsFuncDecorator
+            from overload_numpy.wrapper.func import AssistsFunc, OverloadFuncDecorator
             from overload_numpy.wrapper.many import AssistsManyDecorator
-            from overload_numpy.wrapper.ufunc import AssistsUFuncDecorator
+            from overload_numpy.wrapper.ufunc import (
+                AssistsUFunc,
+                OverloadUFuncDecorator,
+            )
 
             ms = _parse_methods(methods)
             return AssistsManyDecorator(
-                tuple(
-                    (
-                        AssistsUFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=npf, methods=ms)
+                {
+                    _get_key(npf): (
+                        OverloadUFuncDecorator(
+                            AssistsUFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=npf, methods=ms
+                        )
                         if isinstance(npf, UFuncLike)
-                        else AssistsFuncDecorator(overloader=self, dispatch_on=dispatch_on, numpy_func=npf, types=types)
+                        else OverloadFuncDecorator(
+                            AssistsFunc, overloader=self, dispatch_on=dispatch_on, numpy_func=npf, types=types
+                        )
                     )
                     for npf in numpy_funcs
-                )
+                }
             )

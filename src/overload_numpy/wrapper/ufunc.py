@@ -10,25 +10,22 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    ClassVar,
     Generic,
     KeysView,
     Mapping,
+    TypedDict,
     TypeVar,
     final,
 )
 
 # LOCAL
-from overload_numpy.utils import (
-    UFMT,
-    UFMsT,
-    UFuncMethodOverloadMap,
-    _get_key,
-    _parse_methods,
-)
+from overload_numpy.utils import UFMT, UFMsT, _get_key, _parse_methods
 from overload_numpy.wrapper.dispatch import Dispatcher
 
 if TYPE_CHECKING:
+    # THIRDPARTY
+    from typing_extensions import NotRequired
+
     # LOCAL
     from overload_numpy._typeutils import UFuncLike
     from overload_numpy.overload import NumPyOverloader
@@ -43,6 +40,17 @@ C = TypeVar("C", bound="Callable[..., Any]")
 UT = TypeVar("UT", "ImplementsUFunc", "AssistsUFunc")
 
 
+class UFuncMethodOverloadMap(TypedDict):
+    """Dictionary of |ufunc| method key (str) to the method overload (func)."""
+
+    __call__: Callable[..., Any]
+    at: NotRequired[Callable[..., Any]]
+    accumulate: NotRequired[Callable[..., Any]]
+    outer: NotRequired[Callable[..., Any]]
+    reduce: NotRequired[Callable[..., Any]]
+    reduceat: NotRequired[Callable[..., Any]]
+
+
 ##############################################################################
 # CODE
 ##############################################################################
@@ -52,9 +60,11 @@ UT = TypeVar("UT", "ImplementsUFunc", "AssistsUFunc")
 class OverrideUFuncBase:
     """Base class to overloading a |func|.
 
+
+
     Parameters
     ----------
-    funcs : dict[str, Callable], keyword-only
+    _funcs : dict[str, Callable], positional-only
         The overloading function for each |ufunc| method.
     implements: |ufunc|, keyword-only
         The overloaded |ufunc|.
@@ -166,10 +176,6 @@ class RegisterUFuncMethodDecorator:
         Only the ``__call__`` method is public API. Instances of this class are
         created as-needed by |NumPyOverloader| if a |ufunc| override is
         registered. Users should not make an instance of this class.
-
-    Methods
-    -------
-    __call__
     """
 
     _funcs_dict: UFuncMethodOverloadMap
@@ -202,7 +208,7 @@ class RegisterUFuncMethodDecorator:
 
 
 @dataclass(frozen=True)
-class OverloadUFuncDecoratorBase(Generic[UT]):
+class OverloadUFuncDecorator(Generic[UT]):
     """Base class for |ufunc| overload decorator.
 
     Parameters
@@ -216,29 +222,13 @@ class OverloadUFuncDecoratorBase(Generic[UT]):
         Set of names of |ufunc| methods.
     overloader : |NumPyOverloader|, keyword-only
         Overloader instance.
-
-    Attributes
-    ----------
-    OverrideCls : type
-        Class attribute.
     """
 
-    OverrideCls: ClassVar[type]
-
+    override_cls: type[UT]
     dispatch_on: type
-    """The type dispatched on.
-
-    See :class:`~overload_numpy.wrapper.dispatch.Dispatcher`.
-    """
-
     numpy_func: UFuncLike
-    """The :mod:`numpy` function that is being overloaded."""
-
     methods: frozenset[UFMT]
-    """Set of names of |ufunc| methods."""
-
     overloader: NumPyOverloader
-    """|NumPyOverloader| instance."""
 
     def __post_init__(self) -> None:
         # Make single-dispatcher for numpy function
@@ -261,9 +251,13 @@ class OverloadUFuncDecoratorBase(Generic[UT]):
             `overload_numpy.wrapper.ufunc.ImplementsUFunc` or
             `overload_numpy.wrapper.ufunc.AssistsUFunc`.
         """
+        methods = UFuncMethodOverloadMap(__call__=func)
+        for m in self.methods - {"__call__"}:
+            methods[m] = func
+
         # Adding a new numpy function
-        info: UT = self.OverrideCls(
-            _funcs={m: func for m in self.methods},  # includes __call__
+        info: UT = self.override_cls(
+            _funcs=methods,  # includes __call__
             implements=self.numpy_func,
             dispatch_on=self.dispatch_on,
         )
@@ -275,9 +269,6 @@ class OverloadUFuncDecoratorBase(Generic[UT]):
 
 
 ##############################################################################
-
-# ============================================================================
-# Implements
 
 
 @dataclass(frozen=True)
@@ -335,35 +326,6 @@ class ImplementsUFunc(OverrideUFuncBase):
 
 
 @dataclass(frozen=True)
-class ImplementsUFuncDecorator(OverloadUFuncDecoratorBase[ImplementsUFunc]):
-    """Decorator for registering with |NumPyOverloader|.
-
-    .. warning::
-
-        Only the ``__call__`` methods is currently public API. Instances of this
-        class are created as-needed by |NumPyOverloader| whenever a |ufunc|
-        override is made with `~overload_numpy.NumPyOverloader.implements`.
-
-    Parameters
-    ----------
-    numpy_func : Callable[..., Any]
-        The :mod:`numpy` function that is being overloaded.
-    dispatch_on : type
-            The class type for which the overload implementation is being
-            registered.
-    overloader : |NumPyOverloader|
-        Overloader instance.
-
-    """
-
-    OverrideCls: ClassVar[type[ImplementsUFunc]] = ImplementsUFunc
-
-
-# ============================================================================
-# Assists
-
-
-@dataclass(frozen=True)
 class AssistsUFunc(OverrideUFuncBase):
     """Assists a |ufunc| override.
 
@@ -409,30 +371,3 @@ class AssistsUFunc(OverrideUFuncBase):
         if not self.validate_method(method):
             return NotImplemented
         return self._funcs[method](calling_type, getattr(self.implements, method), *args, **kwargs)
-
-
-@dataclass(frozen=True)
-class AssistsUFuncDecorator(OverloadUFuncDecoratorBase[AssistsUFunc]):
-    """Decorator to register a |ufunc| override assist with |NumPyOverloader|.
-
-    .. warning::
-
-        Only the ``__call__`` methods is currently public API. Instances of this
-        class are created as-needed by |NumPyOverloader| whenever a |ufunc|
-        override is made with `~overload_numpy.NumPyOverloader.assists`.
-
-    Parameters
-    ----------
-    overloader : |NumPyOverloader|, keyword-only
-        Overloader instance.
-    numpy_func : Callable[..., Any], keyword-only
-        The :mod:`numpy` function that is being overloaded.
-    methods : set[str], keyword-only
-        Set of names of |ufunc| methods -- {'__call__', 'at', 'accumulate',
-        'outer', 'reduce'}.
-    dispatch_on : type, keyword-only
-        The class type for which the overload implementation is being
-        registered.
-    """
-
-    OverrideCls: ClassVar[type[AssistsUFunc]] = AssistsUFunc
