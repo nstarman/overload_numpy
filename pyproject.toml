@@ -1,6 +1,6 @@
 [project]
   name = "overload_numpy"
-  version = "0.0.1"
+  version = "0.1.0"
   description = "Overload NumPy Functions"
   readme = "README.rst"
   requires-python = ">=3.8"
