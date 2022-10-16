@@ -24,9 +24,6 @@ from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import UFMT, UFMsT, _get_key, _parse_methods
 
 if TYPE_CHECKING:
-    # THIRDPARTY
-    from typing_extensions import NotRequired
-
     # LOCAL
     from overload_numpy._typeutils import UFuncLike
     from overload_numpy.overload import NumPyOverloader
@@ -41,15 +38,21 @@ C = TypeVar("C", bound="Callable[..., Any]")
 UT = TypeVar("UT", "ImplementsUFunc", "AssistsUFunc")
 
 
-class UFuncMethodOverloadMap(TypedDict):
-    """Dictionary of |ufunc| method key (str) to the method overload (func)."""
+# TODO! merge with UFuncMethodOverloadMap when NotRequired (py3.11+)
+class UFuncMethodRequiredOverloadMap(TypedDict):
+    """Dictionary of required |ufunc| methods."""
 
     __call__: Callable[..., Any]
-    at: NotRequired[Callable[..., Any]]
-    accumulate: NotRequired[Callable[..., Any]]
-    outer: NotRequired[Callable[..., Any]]
-    reduce: NotRequired[Callable[..., Any]]
-    reduceat: NotRequired[Callable[..., Any]]
+
+
+class UFuncMethodOverloadMap(UFuncMethodRequiredOverloadMap, total=False):
+    """Dictionary of |ufunc| method key (str) to the method overload (func)."""
+
+    at: Callable[..., Any]
+    accumulate: Callable[..., Any]
+    outer: Callable[..., Any]
+    reduce: Callable[..., Any]
+    reduceat: Callable[..., Any]
 
 
 ##############################################################################
