@@ -106,14 +106,17 @@ jobs:
     if: (github.event_name == 'push' || github.event_name == 'pull_request')
     needs: initial_checks
     with:
-      upload_to_pypi: false
+      upload_to_pypi: true
+      repository_url: https://test.pypi.org/legacy/
       upload_to_anaconda: false
       test_extras: test
-      test_command: ls $GITHUB_WORKSPACE; pytest $GITHUB_WORKSPACE/tests $GITHUB_WORKSPACE/docs
+      test_command: pytest $GITHUB_WORKSPACE/tests $GITHUB_WORKSPACE/docs
+    secrets:
+      pypi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
 
+  # FIXME! use OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@v1
   test_wheel_building:
     # This ensures that a couple of targets work fine in pull requests and pushes
-    # FIXME! use OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@v1
     name: mypyc wheels (${{ matrix.name }})
     if: (github.event_name == 'push' || github.event_name == 'pull_request')
     needs: initial_checks

@@ -13,12 +13,14 @@ jobs:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
     with:
       upload_to_pypi: true
-      upload_to_anaconda: false  # TODO!
+      upload_to_anaconda: true
       test_extras: test
       test_command: ls $GITHUB_WORKSPACE; pytest $GITHUB_WORKSPACE/tests $GITHUB_WORKSPACE/docs
     secrets:
       pypi_token: ${{ secrets.PYPI_API_TOKEN }}
+      anaconda_token: ${{ secrets.CONDA_API_TOKEN }}
 
+  # FIXME! use OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@v1
   mypyc:
     name: mypyc wheels (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
