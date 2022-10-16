@@ -114,9 +114,9 @@ jobs:
     secrets:
       pypi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
 
+  # FIXME! use OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@v1
   test_wheel_building:
     # This ensures that a couple of targets work fine in pull requests and pushes
-    # FIXME! use OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@v1
     name: mypyc wheels (${{ matrix.name }})
     if: (github.event_name == 'push' || github.event_name == 'pull_request')
     needs: initial_checks
