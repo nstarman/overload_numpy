@@ -106,7 +106,7 @@ jobs:
     if: (github.event_name == 'push' || github.event_name == 'pull_request')
     needs: initial_checks
     with:
-      upload_to_pypi: true
+      upload_to_pypi: false
       repository_url: https://test.pypi.org/legacy/
       upload_to_anaconda: false
       test_extras: test
