@@ -26,7 +26,6 @@ NP_OVERLOADS = NumPyOverloader()
 
 @dataclass
 class Wrap1(NPArrayOverloadMixin):
-
     x: np.ndarray
     NP_OVERLOADS: ClassVar[NumPyOverloader] = NP_OVERLOADS
 

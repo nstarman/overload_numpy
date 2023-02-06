@@ -12,6 +12,7 @@ __all__: list[str] = []
 ##############################################################################
 # TYPING
 
+
 # TODO! mypyc when https://github.com/mypyc/mypyc/issues/909 fixed
 @runtime_checkable
 class UFuncLike(Protocol):

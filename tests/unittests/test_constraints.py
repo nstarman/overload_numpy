@@ -27,7 +27,6 @@ from overload_numpy.constraints import (
 
 @pytest.mark.xfail
 def test_TypeConstraint_Protocol():
-
     assert issubclass(TypeConstraint, Protocol)
     assert hasattr(TypeConstraint, "validate_type")
 
