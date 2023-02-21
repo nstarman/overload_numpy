@@ -1,13 +1,8 @@
-##############################################################################
-# IMPORTS
-
-# THIRDPARTY
 import pytest
-
-# LOCAL
-from .test_base import OverloadDecoratorBase_Test, OverloadWrapperBase_Test
 from overload_numpy.implementors.dispatch import DispatchWrapper
 from overload_numpy.implementors.ufunc import OverloadUFuncDecorator
+
+from .test_base import OverloadDecoratorBase_Test, OverloadWrapperBase_Test
 
 ##############################################################################
 # TESTS
@@ -41,7 +36,7 @@ class OverloadUFuncDecorator_Test(OverloadDecoratorBase_Test):
     # @pytest.mark.parametrize("test", [None, int, Covariant(int), (int, Covariant(int))])
     @pytest.mark.skip(reason="TODO")
     def test__parse_types(self, decorator, types):
-        assert False
+        raise AssertionError
 
     def test___call__(self, decorator, custom_func, dispatch_on, OverrideCls):
         # calling the decorator registers ``custom_func``.

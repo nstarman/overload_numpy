@@ -1,32 +1,27 @@
 """Implementation of overrides for many functions and |ufunc|."""
 
 
-##############################################################################
-# IMPORTS
-
 from __future__ import annotations
 
-# STDLIB
 import itertools
 from dataclasses import dataclass
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
-    ItemsView,
-    Iterator,
-    KeysView,
     Mapping,
     TypeVar,
     Union,
-    ValuesView,
 )
 
-# LOCAL
 from overload_numpy.implementors.func import AssistsFunc, OverloadFuncDecorator
 from overload_numpy.implementors.ufunc import AssistsUFunc, OverloadUFuncDecorator
 from overload_numpy.utils import UFMT, UFMsT, _get_key, _parse_methods
 
 __all__: list[str] = []
+
+if TYPE_CHECKING:
+    from typing import ItemsView, Iterator, KeysView, ValuesView
 
 ##############################################################################
 # TYPING
@@ -81,7 +76,8 @@ class AssistsManyDecorator(Mapping[str, V]):
         `overload_numpy.wrapper.many.AssistsManyDecorator`
         """
         if self._is_set:
-            raise ValueError("AssistsManyDecorator can only be called once")
+            msg = "AssistsManyDecorator can only be called once"
+            raise ValueError(msg)
 
         self.__wrapped__ = assists_func
 
@@ -115,7 +111,8 @@ class AssistsManyDecorator(Mapping[str, V]):
             (or set thereof).
         """
         if self._is_set is False:
-            raise ValueError("need to call this decorator first")
+            msg = "need to call this decorator first"
+            raise ValueError(msg)
 
         return RegisterManyUFuncMethodDecorator(self._ufunc_wrappers, _parse_methods(methods))
 
@@ -177,5 +174,5 @@ class RegisterManyUFuncMethodDecorator:
             Unchanged.
         """
         for ufw, m in itertools.product(self._ufunc_wrappers.values(), self._applicable_methods):
-            ufw._funcs[m] = assist_ufunc_method
+            ufw._funcs[m] = assist_ufunc_method  # noqa: SLF001
         return assist_ufunc_method

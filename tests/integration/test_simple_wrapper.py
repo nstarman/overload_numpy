@@ -1,19 +1,12 @@
-##############################################################################
-# IMPORTS
-
 from __future__ import annotations
 
-# STDLIB
 import copy
 import re
 from dataclasses import dataclass, fields
 from typing import ClassVar
 
-# THIRDPARTY
 import numpy as np
 import pytest
-
-# LOCAL
 from overload_numpy import NPArrayOverloadMixin, NumPyOverloader
 from overload_numpy.constraints import Covariant
 
@@ -65,32 +58,24 @@ def add_at(w1, indices, w2):
 @add.register("accumulate")
 def add_accumulate(w1, axis=0, dtype=None, out=None):
     # if out is not None:  # TODO!
-    #     np.add.accumulate(w1.x, axis=axis, dtype=dtype, out=out.x)
-    #     return out
     return Wrap1(np.add.accumulate(w1.x, axis=axis, dtype=dtype))
 
 
 @add.register("outer")
 def add_outer(w1, w2, /, *, out=None, **kwargs):
     # if out is not None:  # TODO!
-    #     np.add.outer(w1.x, w2.x, out=out.x, **kwargs)
-    #     return out
     return Wrap1(np.add.outer(w1.x, w2.x, **kwargs))
 
 
 @add.register("reduce")
 def add_reduce(w, out=None, **kwargs):
     # if out is not None:  # TODO!
-    #     np.add.reduce(w.x, out=out.x, **kwargs)
-    #     return out
     return Wrap1(np.add.reduce(w.x, **kwargs))
 
 
 @add.register("reduceat")
 def add_reduceat(w, indices, axis=0, dtype=None, out=None):
     # if out is not None:   # TODO!
-    #     np.add.reduceat(w.x, indices, axis=axis, dtype=dtype, out=out.x)
-    #     return out
     return Wrap1(np.add.reduceat(w.x, indices, axis=axis, dtype=dtype))
 
 
@@ -143,8 +128,6 @@ def mul_reduce_assists(cls, func, /, w1, **kwargs):
 @mul_assists.register("reduceat")
 def mul_reduceat_assists(cls, func, /, w1, indices, axis=0, dtype=None, out=None):
     # if out is not None:   # TODO!
-    #     np.add.reduceat(w.x, indices, axis=axis, dtype=dtype, out=out.x)
-    #     return out
     return cls(*(func(getattr(w1, f.name), indices, axis=axis, dtype=dtype) for f in fields(cls)))
 
 
@@ -152,37 +135,37 @@ def mul_reduceat_assists(cls, func, /, w1, indices, axis=0, dtype=None, out=None
 # FIXTURES
 
 
-@pytest.fixture
+@pytest.fixture()
 def overloader() -> NumPyOverloader:
     return NP_OVERLOADS
 
 
-@pytest.fixture
+@pytest.fixture()
 def array() -> np.ndarray:
     return np.arange(1, 11, dtype=float)  # to avoid dividing by 0
 
 
-@pytest.fixture
+@pytest.fixture()
 def array2() -> np.ndarray:
     return np.arange(11, 21, dtype=float)
 
 
-@pytest.fixture
+@pytest.fixture()
 def w1(array: np.ndarray) -> Wrap1:
     return Wrap1(array)
 
 
-@pytest.fixture
+@pytest.fixture()
 def w1b(array: np.ndarray) -> Wrap1:
     return Wrap1(array)
 
 
-@pytest.fixture
+@pytest.fixture()
 def w2(array: np.ndarray, array2: np.ndarray) -> Wrap2:
     return Wrap2(array, array2)
 
 
-@pytest.fixture
+@pytest.fixture()
 def w2b(array: np.ndarray, array2: np.ndarray) -> Wrap2:
     return Wrap2(array, array2)
 
@@ -196,7 +179,7 @@ def test_entry(overloader, w1, func):
     """Test current entries."""
     # what's registered
     assert func in overloader
-    assert f"numpy.{func.__name__}" in overloader.keys()
+    assert f"numpy.{func.__name__}" in overloader
 
     # `numpy` function -> Dispatcher
     dispatcher = overloader[np.concatenate]
@@ -230,7 +213,7 @@ class Test_Concatenate:
         assert np.array_equal(nw.x, na)
 
     def test_types_must_be_compatible(self, w1):
-        with pytest.raises(Exception):
+        with pytest.raises(AttributeError, match="'object' object has no attribute 'x'"):
             np.concatenate((w1, object()))
 
     def test_compatible_types_can_be_wrong(self, w1, w2):
@@ -246,7 +229,7 @@ class Test_Add:
         assert np.array_equal(nw.x, na)
 
     def test_types_must_be_compatible(self, w1):
-        with pytest.raises(Exception):
+        with pytest.raises(AttributeError, match="'object' object has no attribute 'x'"):
             np.add(w1, object())
 
     def test_compatible_types_can_be_wrong(self, w1, w2):
@@ -291,7 +274,7 @@ class Test_stacks:
         assert np.array_equal(nw.x, na)
 
     def test_types_must_be_compatible(self, func, w1):
-        with pytest.raises(Exception):
+        with pytest.raises(AttributeError, match="'object' object has no attribute 'x'"):
             func((w1, object()))
 
     def test_compatible_types_fail(self, func, w1, w2):
@@ -319,7 +302,7 @@ class Test_muls:
         assert np.array_equal(nw.x, na)
 
     def test_types_must_be_compatible(self, func, w1):
-        with pytest.raises(Exception):
+        with pytest.raises(AttributeError, match="'object' object has no attribute 'x'"):
             func(w1, object())
 
     def test_compatible_types_fail(self, func, w1, w2):

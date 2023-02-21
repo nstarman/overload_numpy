@@ -1,14 +1,7 @@
-##############################################################################
-# IMPORTS
-
-# STDLIB
 import pickle
 from copy import copy, deepcopy
 
-# THIRDPARTY
 import pytest
-
-# LOCAL
 from overload_numpy.implementors.dispatch import Dispatcher
 
 ##############################################################################
@@ -56,16 +49,16 @@ class Test_Dispatcher:
     # ===============================================================
     # Usage Tests
 
-    @pytest.mark.incompatible_with_mypyc
-    @pytest.mark.xfail
+    @pytest.mark.incompatible_with_mypyc()
+    @pytest.mark.xfail()
     def test_copy(self, dispatcher) -> None:
         # TODO! get copy working.
         # copying
         assert copy(dispatcher) == dispatcher
         assert deepcopy(dispatcher) == dispatcher
 
-    @pytest.mark.incompatible_with_mypyc
-    @pytest.mark.xfail
+    @pytest.mark.incompatible_with_mypyc()
+    @pytest.mark.xfail()
     def test_serialization(self, dispatcher) -> None:
         # TODO! get serialization working.
         # pickling

@@ -1,9 +1,5 @@
-##############################################################################
-# IMPORTS
-
 from __future__ import annotations
 
-# STDLIB
 from typing import Any, Protocol, runtime_checkable
 
 __all__: list[str] = []
@@ -22,7 +18,7 @@ class UFuncLike(Protocol):
     """
 
     @property
-    def __name__(self) -> str:
+    def __name__(self) -> str:  # noqa: A003
         """Class name."""
         ...
 
@@ -38,14 +34,23 @@ class UFuncLike(Protocol):
         """|ufunc| ``accumulate`` method."""
         ...
 
-    def outer(self, A: Any, B: Any, /, **kwargs: Any) -> Any:
+    def outer(self, a: Any, b: Any, /, **kwargs: Any) -> Any:
         """|ufunc| ``outer`` method."""
         ...
 
-    def reduce(self, array: Any, axis: Any, dtype: Any, out: Any, keepdims: Any, initial: Any, where: Any) -> Any:
+    def reduce(  # noqa: PLR0913
+        self,
+        array: Any,
+        axis: Any,
+        dtype: Any,
+        out: Any,
+        keepdims: Any,
+        initial: Any,
+        where: Any,
+    ) -> Any:
         """|ufunc| ``reduce`` method."""
         ...
 
-    def reduceat(self, array: Any, indices: Any, axis: Any, dtype: Any, out: Any) -> Any:
+    def reduceat(self, array: Any, indices: Any, axis: Any, dtype: Any, out: Any) -> Any:  # noqa: PLR0913
         """|ufunc| ``reduceat`` method."""
         ...

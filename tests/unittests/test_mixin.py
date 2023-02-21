@@ -1,28 +1,20 @@
 """Test :mod:`overload_numpy.mixin`."""
 
-##############################################################################
-# IMPORTS
 
-# STDLIB
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, ClassVar
+from dataclasses import dataclass, field, make_dataclass
+from typing import ClassVar, FrozenSet, Optional, Union
 
-# THIRDPARTY
 import numpy as np
 import pytest
-
-# LOCAL
-from .data import A
 from overload_numpy import NumPyOverloader
+from overload_numpy.constraints import TypeConstraint
 from overload_numpy.mixin import (
     NPArrayFuncOverloadMixin,
     NPArrayOverloadMixin,
     NPArrayUFuncOverloadMixin,
 )
 
-if TYPE_CHECKING:
-    # LOCAL
-    from overload_numpy.constraints import TypeConstraint
+from .data import A
 
 ##############################################################################
 # TESTS
@@ -48,7 +40,7 @@ class NPArrayOverloadMixinTestBase:
 ##############################################################################
 
 
-class Test_NPArrayFuncOverloadMixin:
+class Test_NPArrayFuncOverloadMixin(NPArrayOverloadMixinTestBase):
     @pytest.fixture(scope="class", params=[None, frozenset(), frozenset({A})])
     def NP_FUNC_TYPES(self, request):
         return request.param
@@ -59,13 +51,24 @@ class Test_NPArrayFuncOverloadMixin:
 
     @pytest.fixture(scope="class")
     def data_cls(self, mixin_cls, NP_OVERLOADS, NP_FUNC_TYPES):
-        @dataclass
-        class Wrap1D(mixin_cls):
-            x: np.ndarray
-            NP_OVERLOADS: ClassVar[NumPyOverloader] = NP_OVERLOADS
-            NP_FUNC_TYPES: ClassVar[frozenset[type | TypeConstraint] | None] = NP_FUNC_TYPES
+        return make_dataclass(
+            "Wrap1D",
+            fields=[
+                ("x", np.ndarray),
+                ("NP_OVERLOADS", ClassVar[NumPyOverloader], field(default=NP_OVERLOADS)),
+                (
+                    "NP_FUNC_TYPES",
+                    ClassVar[Optional[FrozenSet[Union[type, TypeConstraint]]]],
+                    field(default=NP_FUNC_TYPES),
+                ),
+            ],
+            bases=(mixin_cls,),
+        )
 
     # ===============================================================
+
+    def test_data_cls(self, data_cls, NP_OVERLOADS):
+        assert isinstance(data_cls.NP_OVERLOADS, type(NP_OVERLOADS))
 
     @pytest.mark.skip(reason="TODO")
     def test__array_function__(self, data_cls):
@@ -86,6 +89,8 @@ class Test_NPArrayUFuncOverloadMixin:
         class Wrap1D(mixin_cls):
             x: np.ndarray
             NP_OVERLOADS: ClassVar[NumPyOverloader] = NP_OVERLOADS
+
+        return Wrap1D
 
     # ===============================================================
 

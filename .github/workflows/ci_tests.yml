@@ -62,7 +62,7 @@ jobs:
           - name: Python 3.8 with oldest supported version of all dependencies
             os: ubuntu-18.04
             python: '3.8'
-            toxenv: py38-test-oldestdeps-alldeps-cov-clocale
+            toxenv: py38-test-oldestdeps-alldeps-cov
 
           - name: Python 3.9 with all optional dependencies (Windows)
             os: windows-latest

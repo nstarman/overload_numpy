@@ -184,23 +184,19 @@ We would also like to implement the ``accumulate`` method for all the
     Wrap2D(x=array([ 0, -1, -3]), y=array([ 3, -1, -6]))
 """
 
-##############################################################################
-# IMPORTS
 
 from __future__ import annotations
 
-# STDLIB
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Collection
+from typing import TYPE_CHECKING, Any, Callable, ClassVar
 
-# THIRDPARTY
 from mypy_extensions import mypyc_attr, trait
 
-# LOCAL
 from overload_numpy.implementors.func import AssistsFunc, ImplementsFunc
 from overload_numpy.implementors.ufunc import AssistsUFunc, ImplementsUFunc
 
 if TYPE_CHECKING:
-    # LOCAL
+    from typing import Collection
+
     from overload_numpy._typeutils import UFuncLike
     from overload_numpy.constraints import TypeConstraint
     from overload_numpy.overload import NumPyOverloader
@@ -352,7 +348,11 @@ class NPArrayFuncOverloadMixin:
     NP_FUNC_TYPES: ClassVar[frozenset[type | TypeConstraint] | None] = frozenset()
 
     def __array_function__(
-        self, func: Callable[..., Any], types: Collection[type], args: tuple[Any, ...], kwargs: dict[str, Any]
+        self,
+        func: Callable[..., Any],
+        types: Collection[type],
+        args: tuple[Any, ...],
+        kwargs: dict[str, Any],
     ) -> Any:
         """|array_function|_.
 
@@ -361,8 +361,8 @@ class NPArrayFuncOverloadMixin:
         func : Callable[..., Any]
             The overloaded :mod:`numpy` function.
         types : Collection[type]
-            ``types`` is a collection collections.abc.Collection of unique
-            argument types from the original NumPy function call that implement
+            ``types`` is a `~collections.abc.Collection` of unique argument
+            types from the original NumPy function call that implement
             |array_function|_.
         args : tuple[Any, ...]
             The tuple args are directly passed on from the original call.
@@ -409,8 +409,7 @@ class NPArrayFuncOverloadMixin:
 @mypyc_attr(allow_interpreted_subclasses=True)
 @trait
 class NPArrayUFuncOverloadMixin:
-    """
-    Mixin for adding |array_ufunc|_ to a class.
+    """Mixin for adding |array_ufunc|_ to a class.
 
     This mixin adds the method ``__array_ufunc__``. Subclasses must define a
     class variable ``NP_OVERLOADS``.
@@ -589,8 +588,7 @@ class NPArrayUFuncOverloadMixin:
 
 @mypyc_attr(allow_interpreted_subclasses=True)
 class NPArrayOverloadMixin(NPArrayFuncOverloadMixin, NPArrayUFuncOverloadMixin):
-    """
-    Mixin for adding |array_ufunc|_ and |array_function|_ to a class.
+    """Mixin for adding |array_ufunc|_ and |array_function|_ to a class.
 
     This mixin adds the methods ``__array_ufunc__`` and ``__array_function__``.
     Subclasses must define a class variable ``NP_OVERLOADS`` and optionally

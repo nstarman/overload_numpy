@@ -1,18 +1,13 @@
-##############################################################################
-# IMPORTS
-
-# THIRDPARTY
 import numpy as np
 import pytest
-
-# LOCAL
-from .test_base import OverloadDecoratorBase_Test, OverloadWrapperBase_Test
 from overload_numpy.implementors.dispatch import DispatchWrapper
 from overload_numpy.implementors.func import (
     AssistsFunc,
     ImplementsFunc,
     OverloadFuncDecorator,
 )
+
+from .test_base import OverloadDecoratorBase_Test, OverloadWrapperBase_Test
 
 ##############################################################################
 # TESTS
@@ -28,6 +23,8 @@ class OverloadFuncDecorator_Test(OverloadDecoratorBase_Test):
     def custom_func(self):
         def concatenate(objs, *args, **kwargs):
             return "custom"
+
+        return concatenate
 
     @pytest.fixture(scope="class", params=[ImplementsFunc, AssistsFunc])
     def OverrideCls(self, request):
@@ -51,7 +48,7 @@ class OverloadFuncDecorator_Test(OverloadDecoratorBase_Test):
     # @pytest.mark.parametrize("test", [None, int, Covariant(int), (int, Covariant(int))])
     @pytest.mark.skip(reason="TODO")
     def test__parse_types(self, decorator, types):
-        assert False
+        raise AssertionError
 
     def test___call__(self, decorator, custom_func, dispatch_on, OverrideCls):
         # calling the decorator registers ``custom_func``.

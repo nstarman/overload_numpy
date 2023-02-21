@@ -1,12 +1,7 @@
 """Unit tests for :mod:`overload_numpy.overload`."""
 
-##############################################################################
-# IMPORTS
 
-# THIRDPARTY
 import pytest
-
-# LOCAL
 from overload_numpy.overload import NumPyOverloader
 
 ##############################################################################
@@ -17,13 +12,13 @@ from overload_numpy.overload import NumPyOverloader
 class Test_NumPyOverloader:
     """Test :class:`overload_numpy.NumPyOverloader`."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def overloader(self) -> NumPyOverloader:
         overloader = NumPyOverloader()
 
         # TODO! mock up items
 
-        return overloader
+        return overloader  # noqa: RET504
 
     # ===============================================================
     # Method unit tests
@@ -70,6 +65,6 @@ class Test_NumPyOverloader:
     # ===============================================================
     # Usage tests
 
-    @pytest.mark.incompatible_with_mypyc
+    @pytest.mark.incompatible_with_mypyc()
     def test_serialization(self, overloader):
         pass
