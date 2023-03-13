@@ -1,14 +1,10 @@
 """Utilities."""
 
-##############################################################################
-# IMPORTS
 
 from __future__ import annotations
 
-# STDLIB
 from typing import Any, Callable, Final, Literal, Set, Union
 
-# LOCAL
 from overload_numpy._typeutils import UFuncLike
 
 __all__: list[str] = []
@@ -60,7 +56,8 @@ def _parse_methods(methods: UFMsT) -> frozenset[UFMT]:
     ms: set[UFMT] = {methods} if isinstance(methods, str) else methods
     # validation that each elt is a UFUNC method type
     if any(m not in VALID_UFUNC_METHODS for m in ms):
-        raise ValueError(f"methods must be an element or subset of {VALID_UFUNC_METHODS}, not {ms}")
+        msg = f"methods must be an element or subset of {VALID_UFUNC_METHODS}, not {ms}"
+        raise ValueError(msg)
     return frozenset(ms)
 
 
@@ -83,10 +80,13 @@ def _get_key(key: str | UFuncLike | Callable[..., Any] | Any) -> str:
         If the key is not one of the known types.
     """
     if isinstance(key, str):
-        return key
+        val = key
     elif isinstance(key, UFuncLike):
-        return f"{key.__class__.__module__}.{key.__name__}"
+        val = f"{key.__class__.__module__}.{key.__name__}"
     elif callable(key):
-        return f"{key.__module__}.{key.__name__}"
+        val = f"{key.__module__}.{key.__name__}"
     else:
-        raise ValueError(f"the key {key} is not a str or Callable[..., Any]")
+        msg = f"the key {key} is not a str or Callable[..., Any]"
+        raise TypeError(msg)
+
+    return val

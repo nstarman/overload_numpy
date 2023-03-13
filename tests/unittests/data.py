@@ -1,7 +1,3 @@
-##############################################################################
-# IMPORTS
-
-# STDLIB
 from dataclasses import dataclass
 
 __all__ = ["A", "B", "C", "D", "E"]

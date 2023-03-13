@@ -1,17 +1,9 @@
-##############################################################################
-# IMPORTS
-
-# STDLIB
 import pickle
 from abc import ABCMeta, abstractmethod
 from copy import copy, deepcopy
 from typing import Protocol
 
-# THIRDPARTY
 import pytest
-
-# LOCAL
-from .data import A, B, C
 from overload_numpy.constraints import (
     Between,
     Contravariant,
@@ -20,14 +12,15 @@ from overload_numpy.constraints import (
     TypeConstraint,
 )
 
+from .data import A, B, C
+
 ##############################################################################
 # TESTS
 ##############################################################################
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail()
 def test_TypeConstraint_Protocol():
-
     assert issubclass(TypeConstraint, Protocol)
     assert hasattr(TypeConstraint, "validate_type")
 
@@ -41,7 +34,7 @@ class TypeConstraint_TestBase(metaclass=ABCMeta):
     def constraint(self, constraint_cls) -> TypeConstraint:
         raise NotImplementedError
 
-    @pytest.fixture
+    @pytest.fixture()
     def types(self):
         return (A, B, C)
 
@@ -55,7 +48,7 @@ class TypeConstraint_TestBase(metaclass=ABCMeta):
     # ===============================================================
     # Usage Tests
 
-    @pytest.mark.incompatible_with_mypyc
+    @pytest.mark.incompatible_with_mypyc()
     def test_serialization(self, constraint) -> None:
         # copying
         assert copy(constraint) == constraint
@@ -67,11 +60,11 @@ class TypeConstraint_TestBase(metaclass=ABCMeta):
 
 
 class Test_Invariant(TypeConstraint_TestBase):
-    @pytest.fixture
+    @pytest.fixture()
     def constraint_cls(self) -> type:
         return Invariant
 
-    @pytest.fixture
+    @pytest.fixture()
     def constraint(self, constraint_cls) -> TypeConstraint:
         return constraint_cls(B)
 
@@ -87,11 +80,11 @@ class Test_Invariant(TypeConstraint_TestBase):
 
 
 class Test_Covariant(TypeConstraint_TestBase):
-    @pytest.fixture
+    @pytest.fixture()
     def constraint_cls(self) -> type:
         return Covariant
 
-    @pytest.fixture
+    @pytest.fixture()
     def constraint(self, constraint_cls) -> TypeConstraint:
         return constraint_cls(B)
 
@@ -107,11 +100,11 @@ class Test_Covariant(TypeConstraint_TestBase):
 
 
 class Test_Contravariant(TypeConstraint_TestBase):
-    @pytest.fixture
+    @pytest.fixture()
     def constraint_cls(self) -> type:
         return Contravariant
 
-    @pytest.fixture
+    @pytest.fixture()
     def constraint(self, constraint_cls) -> TypeConstraint:
         return constraint_cls(B)
 
@@ -127,11 +120,11 @@ class Test_Contravariant(TypeConstraint_TestBase):
 
 
 class Test_Between(TypeConstraint_TestBase):
-    @pytest.fixture
+    @pytest.fixture()
     def constraint_cls(self) -> type:
         return Between
 
-    @pytest.fixture
+    @pytest.fixture()
     def constraint(self, constraint_cls) -> TypeConstraint:
         return constraint_cls(B, A)
 

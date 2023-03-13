@@ -1,14 +1,11 @@
-##############################################################################
-# IMPORTS
+"""Setup `overload_numpy` package."""
 
 from __future__ import annotations
 
-# STDLIB
 import os
 import sys
 from pathlib import Path
 
-# THIRDPARTY
 from mypyc.build import mypycify
 from setuptools import setup
 
@@ -67,7 +64,7 @@ if not USE_MYPYC:
     ext_modules = []
 
 else:
-    print("BUILDING `overload_numpy` WITH MYPYC")
+    print("BUILDING `overload_numpy` WITH MYPYC")  # noqa: T201
 
     blocklist = [  # TODO!
         "overload_numpy/implementors/dispatch.py",  # https://github.com/python/mypy/issues/13613

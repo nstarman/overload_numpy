@@ -1,17 +1,10 @@
-##############################################################################
-# IMPORTS
-
 from __future__ import annotations
 
-# STDLIB
 import inspect
 from itertools import permutations
 
-# THIRDPARTY
 import numpy as np
 import pytest
-
-# LOCAL
 from overload_numpy.utils import UFMT, VALID_UFUNC_METHODS, _get_key, _parse_methods
 
 ##############################################################################
@@ -67,5 +60,5 @@ class Test__get_key:
 
     @pytest.mark.parametrize("key", [object(), 1])
     def test_error(self, key):
-        with pytest.raises(ValueError, match=f"the key {key}"):
+        with pytest.raises(TypeError, match=f"the key {key}"):
             _get_key(key)

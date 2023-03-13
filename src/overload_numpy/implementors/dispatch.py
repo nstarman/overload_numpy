@@ -6,21 +6,16 @@
       https://github.com/python/mypy/issues/13304 are resolved.
 """
 
-##############################################################################
-# IMPORTS
 
 from __future__ import annotations
 
-# STDLIB
 from dataclasses import dataclass
 from functools import singledispatch
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, final
 
 if TYPE_CHECKING:
-    # STDLIB
     import functools
 
-    # LOCAL
     from overload_numpy.implementors.func import AssistsFunc, ImplementsFunc
     from overload_numpy.implementors.ufunc import AssistsUFunc, ImplementsUFunc
 
@@ -30,9 +25,6 @@ __all__: list[str] = []
 # TYPING
 
 WT = TypeVar("WT", "ImplementsFunc", "AssistsFunc", "ImplementsUFunc", "AssistsUFunc")
-# All_Dispatchers = Union[
-#     "Dispatcher[ImplementsUFunc]", "Dispatcher[ImplementsFunc]", "Dispatcher[AssistsFunc]", "Dispatcher[AssistsUFunc]"
-# ]  TODO! parametrization of Dispatcher.  See moved definition below
 
 
 ##############################################################################
@@ -46,10 +38,10 @@ class Dispatcher(Generic[WT]):
 
     def __init__(self) -> None:
         @singledispatch
-        def dispatcher(obj: object, /) -> WT:
+        def dispatcher(_: object, /) -> WT:
             raise NotImplementedError  # See Mixin for handling.
 
-        self._dspr: functools._SingleDispatchCallable[WT]
+        self._dspr: functools._SingleDispatchCallable[WT]  # noqa: SLF001
         self._dspr = dispatcher
 
     def __call__(self, obj: object, /) -> WT:
@@ -89,7 +81,7 @@ class Dispatcher(Generic[WT]):
             parameterization of this generic class.
         """
         self._dspr.register(cls, DispatchWrapper(func))
-        return None
+        return
 
 
 @final

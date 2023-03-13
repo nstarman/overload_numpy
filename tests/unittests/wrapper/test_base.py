@@ -1,13 +1,5 @@
-##############################################################################
-# IMPORTS
-
-# STDLIB
-
-# THIRDPARTY
 import numpy as np
 import pytest
-
-# LOCAL
 from overload_numpy import NumPyOverloader
 from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import _get_key

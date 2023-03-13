@@ -1,30 +1,18 @@
 """Implementations for |ufunc| overrides."""
 
-##############################################################################
-# IMPORTS
 
 from __future__ import annotations
 
-# STDLIB
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Generic,
-    Mapping,
-    TypedDict,
-    TypeVar,
-    final,
-)
+from typing import TYPE_CHECKING, Any, Callable, Generic, TypedDict, TypeVar, final
 
-# LOCAL
 from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import UFMT, UFMsT, _get_key, _parse_methods
 
 if TYPE_CHECKING:
-    # LOCAL
+    from typing import Mapping
+
     from overload_numpy._typeutils import UFuncLike
     from overload_numpy.overload import NumPyOverloader
 
@@ -131,29 +119,41 @@ class OverrideUFuncBase:
 
         .. code-block:: python
 
-            @OverrideUFuncBase.register("accumulate") def add_accumulate(w1,
-            indices, w2):
+            @OverrideUFuncBase.register("accumulate")
+            def add_accumulate(w1, indices, w2):
                 np.add.at(w1.x, indices, w2.x)
 
-        >>> from dataclasses import dataclass
-        >>> from typing import ClassVar
-        >>> import numpy as np
-        >>> from overload_numpy import NumPyOverloader, NPArrayOverloadMixin
+        First, some imports:
 
-        >>> NP_OVERLOADS = NumPyOverloader()
+            >>> from dataclasses import make_dataclass, field
+            >>> from typing import ClassVar
+            >>> import numpy as np
+            >>> from overload_numpy import NumPyOverloader, NPArrayOverloadMixin
 
-        >>> @dataclass
-        ... class Wrap1(NPArrayOverloadMixin):
-        ...     x: np.ndarray
-        ...     NP_OVERLOADS: ClassVar[NumPyOverloader] = NP_OVERLOADS
+        Now we can define a |NumPyOverloader| instance:
 
-        >>> @NP_OVERLOADS.implements(np.add, Wrap1)
-        ... def add(w1, w2, *args, **kwargs):
-        ...     return Wrap1(np.add(w1.x, w2.x, *args, **kwargs))
+            >>> W_FUNCS = NumPyOverloader()
 
-        >>> @add.register("at")
-        ... def add_at(w1, indices, w2):
-        ...     np.add.at(w1.x, indices, w2.x)
+        The overloads apply to an array wrapping class. Let's define one:
+
+            >>> Wrap1D = make_dataclass(
+            ...     "Wrap1D",
+            ...     fields=[
+            ...         ("x", np.ndarray),
+            ...         ("NP_OVERLOADS", ClassVar[NumPyOverloader], field(default=W_FUNCS)),
+            ...     ],
+            ...     bases=(NPArrayOverloadMixin,),
+            ... )
+
+        Now :mod:`numpy` ufuncs can be overloaded and registered for ``Wrap1D``.
+
+            >>> @W_FUNCS.implements(np.add, Wrap1D)
+            ... def add(w1, w2, *args, **kwargs):
+            ...     return Wrap1D(np.add(w1.x, w2.x, *args, **kwargs))
+
+            >>> @add.register("at")
+            ... def add_at(w1, indices, w2):
+            ...     np.add.at(w1.x, indices, w2.x)
 
         Notes
         -----
@@ -232,8 +232,8 @@ class OverloadUFuncDecorator(Generic[UT]):
     def __post_init__(self) -> None:
         """Make single-dispatcher for numpy function."""
         key = _get_key(self.implements)
-        if key not in self.overloader._reg:
-            self.overloader._reg[key] = Dispatcher[UT]()
+        if key not in self.overloader._reg:  # noqa: SLF001
+            self.overloader._reg[key] = Dispatcher[UT]()  # noqa: SLF001
 
     def __call__(self, func: Callable[..., Any], /) -> UT:
         """Register overload on Dispatcher.
@@ -262,7 +262,6 @@ class OverloadUFuncDecorator(Generic[UT]):
         )
         # Register the function. The ``info`` is wrapped by ``DispatchWrapper``
         # so `~functools.singledispatch` returns the ``info``.
-        # self.dispatcher.register(self.dispatch_on, info)
         self.overloader[self.implements].register(self.dispatch_on, info)
         return info
 
@@ -297,7 +296,12 @@ class ImplementsUFunc(OverrideUFuncBase):
     """
 
     def __call__(
-        self, method: UFMT, _: type, /, args: tuple[Any, ...], kwargs: Mapping[str, Any]
+        self,
+        method: UFMT,
+        _: type,
+        /,
+        args: tuple[Any, ...],
+        kwargs: Mapping[str, Any],
     ) -> object:  # TODO: parametrize return type?
         """Evaluate a |ufunc| method with given arguments.
 

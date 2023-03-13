@@ -9,22 +9,16 @@ packagename.test
 
 from __future__ import annotations
 
-# STDLIB
-import os
+import pathlib
+from importlib.metadata import version
 from typing import Any
 
-# THIRDPARTY
 import pytest
 from pytest_astropy_header.display import PYTEST_HEADER_MODULES, TESTED_VERSIONS
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    """Configure Pytest with Astropy.
-
-    Parameters
-    ----------
-    config : pytest configuration
-    """
+    """Configure Pytest with Astropy."""
     config.option.astropy_header = True
 
     # Customize the following lines to add/remove entries from the list of
@@ -32,24 +26,14 @@ def pytest_configure(config: pytest.Config) -> None:
     # tests.
     PYTEST_HEADER_MODULES.pop("Pandas", None)
 
-    # STDLIB
-    from importlib.metadata import version
-
-    packagename = os.path.basename(os.path.dirname(__file__))
+    packagename = pathlib.Path(__file__).parent.name
     TESTED_VERSIONS[packagename] = version("overload_numpy")
 
 
-@pytest.fixture(autouse=True)  # type: ignore
+@pytest.fixture(autouse=True)  # type: ignore[misc]
 def add_numpy(doctest_namespace: dict[str, Any]) -> None:
-    """Add NumPy to Pytest.
-
-    Parameters
-    ----------
-    doctest_namespace : namespace
-
-    """
-    # THIRDPARTY
-    import numpy
+    """Add NumPy to Pytest."""
+    import numpy as np
 
     # add to namespace
-    doctest_namespace["np"] = numpy
+    doctest_namespace["np"] = np

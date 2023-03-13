@@ -1,7 +1,7 @@
 """Classes for defining type constraints in |array_function|_.
 
-|array_function| has an argument ``types``, which is a "collection
-:class:`collections.abc.Collection` of unique argument types from the original
+|array_function| has an argument ``types``, which is a
+:class:`~collections.abc.Collection` of unique argument types from the original
 NumPy function call that implement |array_function|. The purpose of ``types`` is
 to allow implementations of |array_function| to check if all arguments of a type
 that the overload knows how to handle. Normally this is implemented inside of
@@ -101,16 +101,12 @@ types:
     TypeConstraint) will become optional.
 """
 
-##############################################################################
-# IMPORTS
 
 from __future__ import annotations
 
-# STDLIB
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 
-# THIRDPARTY
 from mypy_extensions import mypyc_attr
 
 __all__ = ["TypeConstraint", "Invariant", "Covariant", "Contravariant", "Between"]
@@ -214,8 +210,7 @@ class TypeConstraint(metaclass=ABCMeta):
 @mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Invariant(TypeConstraint):
-    r"""
-    Type constraint for invariance -- the exact type.
+    r"""Type constraint for invariance -- the exact type.
 
     This is equivalent to ``arg_type is bound``.
 
@@ -254,8 +249,7 @@ class Invariant(TypeConstraint):
 @mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Covariant(TypeConstraint):
-    r"""
-    A covariant constraint -- permitting subclasses.
+    r"""A covariant constraint -- permitting subclasses.
 
     This is the most common constraint, equivalent to ``issubclass(arg_type,
     bound)``.
@@ -295,8 +289,7 @@ class Covariant(TypeConstraint):
 @mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Contravariant(TypeConstraint):
-    r"""
-    A contravariant constraint -- permitting superclasses.
+    r"""A contravariant constraint -- permitting superclasses.
 
     An uncommon constraint. See examples for why.
 
@@ -335,8 +328,7 @@ class Contravariant(TypeConstraint):
 @mypyc_attr(allow_interpreted_subclasses=True)
 @dataclass(frozen=True)
 class Between(TypeConstraint):
-    r"""
-    Type constrained between two types.
+    r"""Type constrained between two types.
 
     This combines the functionality of
     :class:`~overload_numpy.constraints.Covariant` and

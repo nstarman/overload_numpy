@@ -1,25 +1,18 @@
 """Implementations for function overrides."""
 
-##############################################################################
-# IMPORTS
 
 from __future__ import annotations
 
-# STDLIB
-from collections.abc import Collection
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Final, Generic, Mapping, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Collection, Final, Generic, Mapping, TypeVar
 
-# THIRDPARTY
 from mypy_extensions import trait
 
-# LOCAL
 from overload_numpy.constraints import Covariant, TypeConstraint
 from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import _get_key
 
 if TYPE_CHECKING:
-    # LOCAL
     from overload_numpy.overload import NumPyOverloader
 
 __all__: list[str] = []
@@ -70,19 +63,12 @@ class ValidatesType:
         """
         # Construct types to check.
         valid_types: Collection[TypeConstraint]
-        if isinstance(self.types, TypeConstraint):
-            valid_types = (self.types,)
-        else:  # isinstance(self.types, Collection)
-            valid_types = self.types
+        valid_types = (self.types,) if isinstance(self.types, TypeConstraint) else self.types
 
         # Check that each type is considered valid. e.g. `types` is (ndarray,
         # bool) and valid_types are (int, ndarray). It passes b/c ndarray <-
         # ndarray and bool <- int.
-        for t in types:
-            if not any(vt.validate_type(t) for vt in valid_types):
-                return False
-        else:
-            return True
+        return all(any(vt.validate_type(t) for vt in valid_types) for t in types)
 
 
 # @dataclass(frozen=True)  # TODO: when https://github.com/python/mypy/issues/13304 fixed
@@ -128,8 +114,8 @@ class OverloadFuncDecorator(Generic[FT]):
     def __post_init__(self) -> None:
         # Make single-dispatcher for numpy function
         key = _get_key(self.implements)
-        if key not in self.overloader._reg:
-            self.overloader._reg[key] = Dispatcher[FT]()
+        if key not in self.overloader._reg:  # noqa: SLF001
+            self.overloader._reg[key] = Dispatcher[FT]()  # noqa: SLF001
 
     @property
     def types(self) -> type | TypeConstraint | Collection[type | TypeConstraint] | None:
@@ -191,14 +177,14 @@ class OverloadFuncDecorator(Generic[FT]):
         if types is not None:
             ts = types
         elif not hasattr(dispatch_type, "NP_FUNC_TYPES"):
-            raise AttributeError(f"if types is None {dispatch_type} must have class-attribute ``NP_FUNC_TYPES``")
+            msg = f"if types is None {dispatch_type} must have class-attribute ``NP_FUNC_TYPES``"
+            raise AttributeError(msg)
         else:
-            ts = getattr(dispatch_type, "NP_FUNC_TYPES")
+            ts = dispatch_type.NP_FUNC_TYPES
 
             if not isinstance(ts, frozenset) or not all(isinstance(t, (type, TypeConstraint)) for t in ts):
-                raise AttributeError(
-                    f"if types is None ``{dispatch_type}.NP_FUNC_TYPES`` must be frozenset[types | TypeConstraint]"
-                )
+                msg = f"if types is None ``{dispatch_type}.NP_FUNC_TYPES`` must be frozenset[types | TypeConstraint]"
+                raise AttributeError(msg)
 
             ts = frozenset({dispatch_type} | ts)  # Adds self type!
 
@@ -211,7 +197,8 @@ class OverloadFuncDecorator(Generic[FT]):
         elif isinstance(ts, Collection):
             parsed = frozenset(t if isinstance(t, TypeConstraint) else Covariant(t) for t in ts)
         else:
-            raise ValueError(f"types must be a {self.types}")
+            msg = f"types must be a {self.types}"  # type: ignore[unreachable]
+            raise TypeError(msg)
 
         return parsed
 
