@@ -274,7 +274,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
                 types=types,
             )
 
-        return overloader  # noqa: RET504
+        return overloader
 
     # ---------------------------------------------------------------
 

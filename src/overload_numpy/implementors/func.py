@@ -197,7 +197,7 @@ class OverloadFuncDecorator(Generic[FT]):
         elif isinstance(ts, Collection):
             parsed = frozenset(t if isinstance(t, TypeConstraint) else Covariant(t) for t in ts)
         else:
-            msg = f"types must be a {self.types}"
+            msg = f"types must be a {self.types}"  # type: ignore[unreachable]
             raise TypeError(msg)
 
         return parsed
