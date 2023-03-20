@@ -5,8 +5,6 @@ name: Upload Python Package to TestPyPi
 
 on:
   workflow_dispatch:
-  schedule:
-  - cron: "0 10 * * 1"
 
 permissions:
   contents: read
