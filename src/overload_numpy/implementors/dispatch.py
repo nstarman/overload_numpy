@@ -81,7 +81,6 @@ class Dispatcher(Generic[WT]):
             parameterization of this generic class.
         """
         self._dspr.register(cls, DispatchWrapper(func))
-        return
 
 
 @final
