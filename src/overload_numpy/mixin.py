@@ -182,6 +182,7 @@ We would also like to implement the ``accumulate`` method for all the
 
     >>> np.subtract.accumulate(w2d)
     Wrap2D(x=array([ 0, -1, -3]), y=array([ 3, -1, -6]))
+
 """
 
 

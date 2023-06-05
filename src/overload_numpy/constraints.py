@@ -99,6 +99,7 @@ types:
     TypeConstraint will eventually be converted to a runtime-checkable
     :class:`typing.Protocol`. When that happens step 1 (subclassing
     TypeConstraint) will become optional.
+
 """
 
 
