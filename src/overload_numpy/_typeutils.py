@@ -9,7 +9,7 @@ __all__: list[str] = []
 # TYPING
 
 
-# TODO! mypyc when https://github.com/mypyc/mypyc/issues/909 fixed
+# TODO: mypyc when https://github.com/mypyc/mypyc/issues/909 fixed
 @runtime_checkable
 class UFuncLike(Protocol):
     """Protocol for checking if an object is |ufunc|-like.

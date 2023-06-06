@@ -41,7 +41,7 @@ class ValidatesType:
         overload is valid.
     """
 
-    # TODO! when py3.10+ add NotImplemented
+    # TODO: when py3.10+ add NotImplemented
     types: TypeConstraint | Collection[TypeConstraint]
     """
     The argument types for the overloaded function.
@@ -95,7 +95,7 @@ class OverloadFuncDecorator(Generic[FT]):
     _override_cls: Final[type[ImplementsFunc] | type[AssistsFunc]]
 
     # TODO: rm when https://github.com/python/mypy/issues/13304 fixed
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         override_cls: type[ImplementsFunc] | type[AssistsFunc],
         *,
@@ -275,7 +275,7 @@ class ImplementsFunc(ValidatesType):
         func(*args, **kwargs)
     """
 
-    # TODO! when py3.10+ add NotImplemented
+    # TODO: when py3.10+ add NotImplemented
     types: TypeConstraint | Collection[TypeConstraint]
     """
     The argument types for the overloaded function.
@@ -345,7 +345,7 @@ class AssistsFunc(ValidatesType):
         func(calling_type: type, implements: FunctionType, *args, **kwargs)
     """
 
-    # TODO! when py3.10+ add NotImplemented
+    # TODO: when py3.10+ add NotImplemented
     types: TypeConstraint | Collection[TypeConstraint]
     """
     The argument types for the overloaded function.

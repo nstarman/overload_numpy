@@ -182,6 +182,7 @@ We would also like to implement the ``accumulate`` method for all the
 
     >>> np.subtract.accumulate(w2d)
     Wrap2D(x=array([ 0, -1, -3]), y=array([ 3, -1, -6]))
+
 """
 
 
@@ -399,7 +400,7 @@ class NPArrayFuncOverloadMixin:
         if not fwrap.validate_types(types):
             return NotImplemented
 
-        # TODO! validation for args and kwargs.
+        # TODO: validation for args and kwargs.
         return fwrap(type(self), args, kwargs)  # Returns result or NotImplemented
 
 

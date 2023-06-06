@@ -1,4 +1,4 @@
-# TODO! figure out how to source from [project.optional-dependencies]
+# TODO: figure out how to source from [project.optional-dependencies]
 coverage[toml]
 hypothesis
 numpy>=1.18

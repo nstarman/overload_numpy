@@ -16,7 +16,7 @@ class Test_NumPyOverloader:
     def overloader(self) -> NumPyOverloader:
         overloader = NumPyOverloader()
 
-        # TODO! mock up items
+        # TODO: mock up items
 
         return overloader  # noqa: RET504
 

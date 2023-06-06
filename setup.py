@@ -66,9 +66,9 @@ if not USE_MYPYC:
 else:
     print("BUILDING `overload_numpy` WITH MYPYC")  # noqa: T201
 
-    blocklist = [  # TODO!
+    blocklist = [  # TODO: not block any
         "overload_numpy/implementors/dispatch.py",  # https://github.com/python/mypy/issues/13613
-        "overload_numpy/implementors/ufunc.py",  # FIXME: can't call ImplementsUFunc
+        "overload_numpy/implementors/ufunc.py",  # TODO: can't call ImplementsUFunc
         "overload_numpy/_typeutils.py",  # https://github.com/mypyc/mypyc/issues/909
     ]
     discovered: list[Path] = []

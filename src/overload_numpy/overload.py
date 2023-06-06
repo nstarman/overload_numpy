@@ -105,7 +105,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         # `_reg` is initialized here for `dataclasses.dataclass` subclasses.
         self._reg: dict[str, All_Dispatchers]
         object.__setattr__(self, "_reg", {})  # compatible with frozen dataclass
-        # TODO  parametrization of Dispatcher.  Use All_Dispatchers
+        # TODO: parametrization of Dispatcher.  Use All_Dispatchers
 
     # ===============================================================
     # Mapping

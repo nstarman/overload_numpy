@@ -99,6 +99,7 @@ types:
     TypeConstraint will eventually be converted to a runtime-checkable
     :class:`typing.Protocol`. When that happens step 1 (subclassing
     TypeConstraint) will become optional.
+
 """
 
 
@@ -110,7 +111,7 @@ from dataclasses import dataclass
 from mypy_extensions import mypyc_attr
 
 __all__ = ["TypeConstraint", "Invariant", "Covariant", "Contravariant", "Between"]
-__doctest_skip__ = ["*"]  # TODO! figure out weird dataclass error
+__doctest_skip__ = ["*"]  # TODO: figure out weird dataclass error
 
 ##############################################################################
 # CODE
