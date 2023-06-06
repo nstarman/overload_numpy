@@ -111,7 +111,7 @@ from dataclasses import dataclass
 from mypy_extensions import mypyc_attr
 
 __all__ = ["TypeConstraint", "Invariant", "Covariant", "Contravariant", "Between"]
-__doctest_skip__ = ["*"]  # TODO! figure out weird dataclass error
+__doctest_skip__ = ["*"]  # TODO: figure out weird dataclass error
 
 ##############################################################################
 # CODE

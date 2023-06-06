@@ -24,7 +24,7 @@ class OverloadUFuncDecorator_Test(OverloadDecoratorBase_Test):
 
     @pytest.fixture(scope="class")
     def types(self):
-        return None  # TODO! type | TypeConstraint | Collection[type | TypeConstraint] | None
+        return None  # TODO: type | TypeConstraint | Collection[type | TypeConstraint] | None
 
     @pytest.fixture(scope="class")
     def decorator(self, decorator_cls, dispatch_on, numpy_func, overloader, types):

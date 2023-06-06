@@ -57,25 +57,25 @@ def add_at(w1, indices, w2):
 
 @add.register("accumulate")
 def add_accumulate(w1, axis=0, dtype=None, out=None):
-    # if out is not None:  # TODO!
+    # if out is not None:  # TODO:
     return Wrap1(np.add.accumulate(w1.x, axis=axis, dtype=dtype))
 
 
 @add.register("outer")
 def add_outer(w1, w2, /, *, out=None, **kwargs):
-    # if out is not None:  # TODO!
+    # if out is not None:  # TODO:
     return Wrap1(np.add.outer(w1.x, w2.x, **kwargs))
 
 
 @add.register("reduce")
 def add_reduce(w, out=None, **kwargs):
-    # if out is not None:  # TODO!
+    # if out is not None:  # TODO:
     return Wrap1(np.add.reduce(w.x, **kwargs))
 
 
 @add.register("reduceat")
 def add_reduceat(w, indices, axis=0, dtype=None, out=None):
-    # if out is not None:   # TODO!
+    # if out is not None:   # TODO:
     return Wrap1(np.add.reduceat(w.x, indices, axis=axis, dtype=dtype))
 
 
@@ -98,7 +98,7 @@ mul_funcs = {np.multiply, np.divide}
 
 @NP_OVERLOADS.assists(mul_funcs, types=Wrap1, dispatch_on=Wrap1)
 def mul_assists(cls, func, /, w1, w2, *args, **kwargs):
-    # TODO! handle "out"
+    # TODO: handle "out"
     return cls(*(func(getattr(w1, f.name), getattr(w2, f.name), *args, **kwargs) for f in fields(cls)))
 
 
@@ -109,25 +109,25 @@ def mul_at_assists(cls, func, /, w1, index, w2):
 
 @mul_assists.register("accumulate")
 def mul_accumulate_assists(cls, func, /, w1, axis=0, dtype=None, out=None):
-    # if out is not None:  # TODO!
+    # if out is not None:  # TODO:
     return cls(*(func(getattr(w1, f.name), axis, dtype, out) for f in fields(cls)))
 
 
 @mul_assists.register("outer")
 def mul_outer_assists(cls, func, /, w1, w2, **kwargs):
-    # if out is not None:  # TODO!
+    # if out is not None:  # TODO:
     return cls(*(func(getattr(w1, f.name), getattr(w2, f.name), **kwargs) for f in fields(cls)))
 
 
 @mul_assists.register("reduce")
 def mul_reduce_assists(cls, func, /, w1, **kwargs):
-    # if out is not None:  # TODO!
+    # if out is not None:  # TODO:
     return cls(*(func(getattr(w1, f.name), **kwargs) for f in fields(cls)))
 
 
 @mul_assists.register("reduceat")
 def mul_reduceat_assists(cls, func, /, w1, indices, axis=0, dtype=None, out=None):
-    # if out is not None:   # TODO!
+    # if out is not None:   # TODO:
     return cls(*(func(getattr(w1, f.name), indices, axis=axis, dtype=dtype) for f in fields(cls)))
 
 
@@ -206,7 +206,7 @@ def test_not_dispatched(overloader, w1):
 
 class Test_Concatenate:
     def test_concatenate(self, w1, array):
-        # TODO! replace with pytest_arraydiff
+        # TODO: replace with pytest_arraydiff
         nw = np.concatenate((w1, w1))
         na = np.concatenate((array, array))
 
@@ -279,7 +279,7 @@ class Test_stacks:
 
     def test_compatible_types_fail(self, func, w1, w2):
         """Wrap2 has extra attributes over Wrap1."""
-        # TODO! figure out why dispatches on Wrap2 before Wrap1
+        # TODO: figure out why dispatches on Wrap2 before Wrap1
         with pytest.raises(AttributeError):
             func((w1, w2))
 
@@ -307,7 +307,7 @@ class Test_muls:
 
     def test_compatible_types_fail(self, func, w1, w2):
         """Wrap2 has extra attributes over Wrap1."""
-        # TODO! figure out why dispatches on Wrap2 before Wrap1
+        # TODO: figure out why dispatches on Wrap2 before Wrap1
         with pytest.raises(AttributeError):
             func(w1, w2)
 

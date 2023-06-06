@@ -52,7 +52,7 @@ class Test_Dispatcher:
     @pytest.mark.incompatible_with_mypyc()
     @pytest.mark.xfail()
     def test_copy(self, dispatcher) -> None:
-        # TODO! get copy working.
+        # TODO: get copy working.
         # copying
         assert copy(dispatcher) == dispatcher
         assert deepcopy(dispatcher) == dispatcher
@@ -60,7 +60,7 @@ class Test_Dispatcher:
     @pytest.mark.incompatible_with_mypyc()
     @pytest.mark.xfail()
     def test_serialization(self, dispatcher) -> None:
-        # TODO! get serialization working.
+        # TODO: get serialization working.
         # pickling
         dumps = pickle.dumps(dispatcher)
         assert pickle.loads(dumps) == dispatcher

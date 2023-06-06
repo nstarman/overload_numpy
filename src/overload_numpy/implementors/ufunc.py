@@ -26,7 +26,7 @@ C = TypeVar("C", bound="Callable[..., Any]")
 UT = TypeVar("UT", "ImplementsUFunc", "AssistsUFunc")
 
 
-# TODO! merge with UFuncMethodOverloadMap when NotRequired (py3.11+)
+# TODO: merge with UFuncMethodOverloadMap when NotRequired (py3.11+)
 class UFuncMethodRequiredOverloadMap(TypedDict):
     """Dictionary of required |ufunc| methods."""
 
@@ -159,7 +159,7 @@ class OverrideUFuncBase:
         -----
         This is a decorator factory.
         """
-        # TODO! validation that the function has the right signature.
+        # TODO: validation that the function has the right signature.
         return RegisterUFuncMethodDecorator(self._funcs, _parse_methods(methods))
 
 

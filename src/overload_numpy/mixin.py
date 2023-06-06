@@ -400,7 +400,7 @@ class NPArrayFuncOverloadMixin:
         if not fwrap.validate_types(types):
             return NotImplemented
 
-        # TODO! validation for args and kwargs.
+        # TODO: validation for args and kwargs.
         return fwrap(type(self), args, kwargs)  # Returns result or NotImplemented
 
 
