@@ -36,7 +36,7 @@ V = Union[OverloadUFuncDecorator[AssistsUFunc], OverloadFuncDecorator[AssistsFun
 ##############################################################################
 
 
-# @dataclass(frozen=True)  # todo when mypyc happy
+# @dataclass(frozen=True)  # TODO: when mypyc happy
 class AssistsManyDecorator(Mapping[str, V]):
     """Class for registering `~overload_numpy.NumPyOverloader.assists` (u)funcs.
 
