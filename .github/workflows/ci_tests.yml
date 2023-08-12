@@ -38,73 +38,44 @@ jobs:
             core.info(`PR opened correctly against ${allowed_basebranch}`);
           }
 
-
   tests:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
-    needs: initial_checks
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-
-          - name: Python 3.10 with minimal dependencies and full coverage
-            os: ubuntu-latest
-            python: '3.10'
-            toxenv: py310-test-cov
-
-          - name: Python 3.11 with minimal dependencies and full coverage
-            os: ubuntu-latest
-            python: '3.11'
-            toxenv: py311-test-cov
-
-          - name: Python 3.9 with all optional dependencies
-            os: ubuntu-latest
-            python: '3.9'
-            toxenv: py39-test-alldeps
-            toxargs: -v --develop
-
-          - name: Python 3.8 with oldest supported version of all dependencies
-            os: ubuntu-20.04
-            python: '3.8'
-            toxenv: py38-test-oldestdeps-alldeps-cov
-
-          - name: Python 3.10 with all optional dependencies (Windows)
-            os: windows-latest
-            python: '3.10'
-            toxenv: py39-test-alldeps
-            toxposargs: --durations=50
-
-          - name: Python 3.10 with all optional dependencies (MacOS X)
-            os: macos-latest
-            python: '3.10'
-            toxenv: py39-test-alldeps
-            toxposargs: --durations=50
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install language-pack-fr and tzdata
-      if: startsWith(matrix.os, 'ubuntu')
-      run: |
-        sudo apt-get update
-        sudo apt-get install language-pack-fr tzdata
-    - name: Install Python dependencies
-      run: python -m pip install --upgrade tox codecov
-    - name: Run tests
-      run: tox ${{ matrix.toxargs }} -e ${{ matrix.toxenv }} -- ${{ matrix.toxposargs }}
-    - name: Upload coverage to codecov
-      if: ${{ contains(matrix.toxenv,'-cov') }}
-      uses: codecov/codecov-action@v2
-      with:
-        file: ./coverage.xml
-
+    needs: [initial_checks]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    with:
+      setenv: |
+        ARCH_ON_CI: "normal"
+        IS_CRON: "false"
+      submodules: false
+      coverage: ""
+      libraries: |
+        apt:
+          - language-pack-fr
+          - tzdata
+      envs: |
+        - name: Python 3.10 with minimal dependencies and full coverage
+          linux: py310-test-cov
+          coverage: codecov
+        - name: Python 3.11 with minimal dependencies and full coverage
+          linux: py311-test-cov
+          coverage: codecov
+        - name: Python 3.11 with all optional dependencies
+          linux: py311-test-alldeps
+          libraries:
+            apt:
+              - language-pack-fr
+              - tzdata
+          toxargs: -v --develop
+        - name: Python 3.8 with oldest supported version of all dependencies
+          linux: py38-test-oldestdeps-alldeps-cov
+          coverage: codecov
+        - name: Python 3.10 with all optional dependencies (Windows)
+          windows: py310-test-alldeps
+          posargs: --durations=50
+        - name: Python 3.10 with all optional dependencies (MacOS X)
+          macos: py310-test-alldeps
+          posargs: --durations=50
 
   test_pure_wheel_building:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v1
