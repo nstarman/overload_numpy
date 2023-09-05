@@ -197,7 +197,7 @@ ignore = [
   "D417",  # TODO: remove when ruff is fixed
 
   # flake8-fixme
-  "T002",  # line contains TODO
+  "FIX002",  # line contains TODO
 
   # flake8-todo (TD)
   "TD002", # Missing author in TODO

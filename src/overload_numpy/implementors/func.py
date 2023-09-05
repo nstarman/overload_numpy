@@ -92,12 +92,12 @@ class OverloadFuncDecorator(Generic[FT]):
         Overloader instance.
     """
 
-    _override_cls: Final[type[ImplementsFunc] | type[AssistsFunc]]
+    _override_cls: Final[type[ImplementsFunc | AssistsFunc]]
 
     # TODO: rm when https://github.com/python/mypy/issues/13304 fixed
     def __init__(  # noqa: PLR0913
         self,
-        override_cls: type[ImplementsFunc] | type[AssistsFunc],
+        override_cls: type[ImplementsFunc | AssistsFunc],
         *,
         dispatch_on: type,
         implements: Callable[..., Any],
