@@ -123,15 +123,15 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         return len(self._reg)
 
     def keys(self) -> KeysView[str]:
-        """Return reigstry keys (`str`)."""
+        """Return registry keys (`str`)."""
         return self._reg.keys()
 
     def values(self) -> ValuesView[All_Dispatchers]:
-        """Return reigstry values (dispatchers)."""
+        """Return registry values (dispatchers)."""
         return self._reg.values()
 
     def items(self) -> ItemsView[str, All_Dispatchers]:
-        """Return reigstry items (str, dispatchers)."""
+        """Return registry items (str, dispatchers)."""
         return self._reg.items()
 
     # ===============================================================
