@@ -219,3 +219,11 @@ ignore = [
 
 [tool.ruff.isort]
 known-third-party = ["numpy", "pytest"]
+
+
+[tool.codespell]
+# The following list of words for codespell to ignore may contain some
+# misspellings that should be revisited and fixed in the future.
+ignore-words-list = """
+    implementors,
+"""
