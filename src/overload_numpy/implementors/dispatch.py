@@ -41,7 +41,7 @@ class Dispatcher(Generic[WT]):
         def dispatcher(_: object, /) -> WT:
             raise NotImplementedError  # See Mixin for handling.
 
-        self._dspr: functools._SingleDispatchCallable[WT]  # noqa: SLF001
+        self._dspr: functools._SingleDispatchCallable[WT]
         self._dspr = dispatcher
 
     def __call__(self, obj: object, /) -> WT:
