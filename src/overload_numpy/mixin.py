@@ -183,8 +183,8 @@ We would also like to implement the ``accumulate`` method for all the
     >>> np.subtract.accumulate(w2d)
     Wrap2D(x=array([ 0, -1, -3]), y=array([ 3, -1, -6]))
 
-"""
 
+"""
 
 from __future__ import annotations
 
@@ -342,6 +342,7 @@ class NPArrayFuncOverloadMixin:
 
         >>> np.hstack((w1d, w1d))
         Wrap1D(x=array([0, 1, 2, 0, 1, 2]))
+
     """
 
     NP_OVERLOADS: ClassVar[NumPyOverloader]
@@ -374,6 +375,7 @@ class NPArrayFuncOverloadMixin:
         -------
         Any
             The result of calling the overloaded functions.
+
         """
         # Check if can be dispatched.
         if not self.NP_OVERLOADS.__contains__(func):
@@ -557,6 +559,7 @@ class NPArrayUFuncOverloadMixin:
 
         >>> np.subtract.accumulate(w2d)
         Wrap2D(x=array([ 0, -1, -3]), y=array([ 3, -1, -6]))
+
     """
 
     NP_OVERLOADS: ClassVar[NumPyOverloader]
@@ -784,4 +787,5 @@ class NPArrayOverloadMixin(NPArrayFuncOverloadMixin, NPArrayUFuncOverloadMixin):
 
         >>> np.subtract.accumulate(w2d)
         Wrap2D(x=array([ 0, -1, -3]), y=array([ 3, -1, -6]))
+
     """

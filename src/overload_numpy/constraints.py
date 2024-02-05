@@ -100,8 +100,8 @@ types:
     :class:`typing.Protocol`. When that happens step 1 (subclassing
     TypeConstraint) will become optional.
 
-"""
 
+"""
 
 from __future__ import annotations
 
@@ -141,6 +141,7 @@ class TypeConstraint(metaclass=ABCMeta):
         ...     that: type
         ...     def validate_type(self, arg_type: type, /) -> bool:
         ...         return arg_type is self.this or arg_type is self.that
+
     """
 
     @abstractmethod
@@ -173,6 +174,7 @@ class TypeConstraint(metaclass=ABCMeta):
             True
             >>> constraint.validate_type(bool)  # subclass
             False
+
         """
 
     def validate_object(self, arg: object, /) -> bool:
@@ -204,6 +206,7 @@ class TypeConstraint(metaclass=ABCMeta):
             True
             >>> constraint.validate_type(bool)  # subclass
             False
+
         """
         return self.validate_type(type(arg))
 
@@ -239,6 +242,7 @@ class Invariant(TypeConstraint):
         False
         >>> constraint.validate_type(object)  # superclass
         False
+
     """
 
     bound: type
@@ -279,6 +283,7 @@ class Covariant(TypeConstraint):
         True
         >>> constraint.validate_type(object)  # superclass
         False
+
     """
 
     bound: type
@@ -318,6 +323,7 @@ class Contravariant(TypeConstraint):
         False
         >>> constraint.validate_type(object)  # superclass
         True
+
     """
 
     bound: type
@@ -373,6 +379,7 @@ class Between(TypeConstraint):
         True
         >>> constraint.validate_type(E)
         False
+
     """
 
     lower_bound: type
@@ -398,5 +405,6 @@ class Between(TypeConstraint):
             >>> constraint = Between(C, B)
             >>> constraint.bounds
             (C, B)
+
         """
         return (self.lower_bound, self.upper_bound)

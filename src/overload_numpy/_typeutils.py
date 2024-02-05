@@ -18,7 +18,7 @@ class UFuncLike(Protocol):
     """
 
     @property
-    def __name__(self) -> str:  # noqa: A003
+    def __name__(self) -> str:
         """Class name."""
         ...
 

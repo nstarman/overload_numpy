@@ -1,6 +1,5 @@
 """Implementation of overrides for many functions and |ufunc|."""
 
-
 from __future__ import annotations
 
 import itertools
@@ -52,6 +51,7 @@ class AssistsManyDecorator(Mapping[str, V]):
     _decorators : dict[str, OverloadFuncDecorator | OverloadUFuncDecorator]
         :class:`dict` of ``OverloadFuncDecorator[AssistsFunc] |
         OverloadUFuncDecorator[AssistsUFunc]``.
+
     """
 
     def __init__(self, decorators: dict[str, V], /) -> None:
@@ -74,6 +74,7 @@ class AssistsManyDecorator(Mapping[str, V]):
         Returns
         -------
         `overload_numpy.wrapper.many.AssistsManyDecorator`
+
         """
         if self._is_set:
             msg = "AssistsManyDecorator can only be called once"
@@ -109,6 +110,7 @@ class AssistsManyDecorator(Mapping[str, V]):
         decorator : `RegisterManyUFuncMethodDecorator`
             Decorator to register a function as an overload for a |ufunc| method
             (or set thereof).
+
         """
         if self._is_set is False:
             msg = "need to call this decorator first"
@@ -172,6 +174,7 @@ class RegisterManyUFuncMethodDecorator:
         -------
         func : Callable[..., Any]
             Unchanged.
+
         """
         for ufw, m in itertools.product(self._ufunc_wrappers.values(), self._applicable_methods):
             ufw._funcs[m] = assist_ufunc_method  # noqa: SLF001

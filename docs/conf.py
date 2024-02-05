@@ -18,6 +18,7 @@ def get_authors() -> set[str]:
     -------
     set[str]
         The authors.
+
     """
     authors: set[str] = set()
     cfg = pathlib.Path(__file__).parent.parent / "pyproject.toml"

@@ -1,6 +1,5 @@
 """Test :mod:`overload_numpy.mixin`."""
 
-
 from dataclasses import dataclass, field, make_dataclass
 from typing import ClassVar, FrozenSet, Optional, Union
 

@@ -38,6 +38,7 @@ def find_python_files(base: Path, exclude: tuple[str, ...] = ("test_",)) -> list
     Returns
     -------
     list[Path]
+
     """
     files: list[Path] = []
 

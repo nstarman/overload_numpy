@@ -1,6 +1,5 @@
 """Implementations for function overrides."""
 
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -39,6 +38,7 @@ class ValidatesType:
     types: `overload_numpy.constraints.TypeConstraint` or collection thereof
         The argument types for the overloaded function. Used to check if the
         overload is valid.
+
     """
 
     # TODO: when py3.10+ add NotImplemented
@@ -60,6 +60,7 @@ class ValidatesType:
         -------
         bool
             Whether the argument types work for the ``func``.
+
         """
         # Construct types to check.
         valid_types: Collection[TypeConstraint]
@@ -90,6 +91,7 @@ class OverloadFuncDecorator(Generic[FT]):
         ``NP_FUNC_TYPES`` specifying the types.
     overloader : |NumPyOverloader|, keyword-only
         Overloader instance.
+
     """
 
     _override_cls: Final[type[ImplementsFunc | AssistsFunc]]
@@ -173,6 +175,7 @@ class OverloadFuncDecorator(Generic[FT]):
             attribute ``NP_FUNC_TYPES``.
             If ``dispatch_type.NP_FUNC_TYPES`` is not a `frozenset` of `type` or
             `overload_numpy.constraints.TypeConstraint
+
         """
         if types is not None:
             ts = types
@@ -224,6 +227,7 @@ class OverloadFuncDecorator(Generic[FT]):
             attribute ``NP_FUNC_TYPES``. If ``dispatch_type.NP_FUNC_TYPES`` is
             not a `frozenset` of `type` or
             `overload_numpy.constraints.TypeConstraint
+
         """
         # Turn ``types`` into only TypeConstraint
         types = self._parse_types(self.types, self.dispatch_on)
@@ -259,6 +263,7 @@ class ImplementsFunc(ValidatesType):
     -------
     validate_types
         Check the types of the arguments.
+
     """
 
     implements: Callable[..., Any]
@@ -299,6 +304,7 @@ class ImplementsFunc(ValidatesType):
         -------
         object
             The result of evaluating the |numpy| function method.
+
         """
         return self.func(*args, **kwargs)
 
@@ -326,6 +332,7 @@ class AssistsFunc(ValidatesType):
     -------
     validate_types
         Check the types of the arguments.
+
     """
 
     implements: Callable[..., Any]
@@ -369,5 +376,6 @@ class AssistsFunc(ValidatesType):
         -------
         object
             The result of evaluating the |numpy| function method.
+
         """
         return self.func(calling_type, self.implements, *args, **kwargs)

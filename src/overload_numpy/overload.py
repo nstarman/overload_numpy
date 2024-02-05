@@ -1,6 +1,5 @@
 """|NumPyOverloader|."""
 
-
 from __future__ import annotations
 
 from typing import (
@@ -94,6 +93,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         >>> vec1d = Wrap1D(np.arange(3))
         >>> np.concatenate((vec1d, vec1d))
         Wrap1D(x=array([0, 1, 2, 0, 1, 2]))
+
     """
 
     def __init__(self) -> None:
@@ -145,8 +145,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
         methods: UFMsT = "__call__",
-    ) -> OverloadUFuncDecorator[ImplementsUFunc]:
-        ...
+    ) -> OverloadUFuncDecorator[ImplementsUFunc]: ...
 
     @overload
     def implements(
@@ -157,8 +156,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
         methods: UFMsT = "__call__",
-    ) -> OverloadFuncDecorator[ImplementsFunc]:
-        ...
+    ) -> OverloadFuncDecorator[ImplementsFunc]: ...
 
     def implements(
         self,
@@ -238,6 +236,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
             >>> np.add(w1d, w1d)
             Wrap1D(x=array([0, 2, 4]))
+
         """
         overloader: OverloadUFuncDecorator[ImplementsUFunc] | OverloadFuncDecorator[ImplementsFunc]
 
@@ -287,8 +286,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
         methods: UFMsT,
-    ) -> OverloadUFuncDecorator[AssistsUFunc]:
-        ...
+    ) -> OverloadUFuncDecorator[AssistsUFunc]: ...
 
     @overload
     def assists(
@@ -299,8 +297,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None,
         methods: UFMsT,
-    ) -> OverloadFuncDecorator[AssistsFunc]:
-        ...
+    ) -> OverloadFuncDecorator[AssistsFunc]: ...
 
     @overload
     def assists(
@@ -311,8 +308,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
         *,
         types: type | TypeConstraint | Collection[type | TypeConstraint] | None = None,
         methods: UFMsT = "__call__",
-    ) -> AssistsManyDecorator:
-        ...
+    ) -> AssistsManyDecorator: ...
 
     def assists(
         self,
@@ -413,6 +409,7 @@ class NumPyOverloader(Mapping[str, Dispatcher[Any]]):
 
             >>> np.subtract.accumulate(w1d)
             Wrap1D(x=array([ 0, -1, -3]))
+
         """
         overloader: OverloadUFuncDecorator[AssistsUFunc] | OverloadFuncDecorator[AssistsFunc] | AssistsManyDecorator
 
