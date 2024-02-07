@@ -1,6 +1,5 @@
 """Unit tests for :mod:`overload_numpy.overload`."""
 
-
 import pytest
 from overload_numpy.overload import NumPyOverloader
 

@@ -1,6 +1,5 @@
 """Utilities."""
 
-
 from __future__ import annotations
 
 from typing import Any, Callable, Final, Literal, Set, Union
@@ -52,6 +51,7 @@ def _parse_methods(methods: UFMsT) -> frozenset[UFMT]:
     ------
     ValueError
         If any of ``methods`` is not one of the allowedd types.
+
     """
     ms: set[UFMT] = {methods} if isinstance(methods, str) else methods
     # validation that each elt is a UFUNC method type
@@ -78,6 +78,7 @@ def _get_key(key: str | UFuncLike | Callable[..., Any] | Any) -> str:
     ------
     ValueError
         If the key is not one of the known types.
+
     """
     if isinstance(key, str):
         val = key

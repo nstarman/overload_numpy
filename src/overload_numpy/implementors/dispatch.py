@@ -6,7 +6,6 @@
       https://github.com/python/mypy/issues/13304 are resolved.
 """
 
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -63,6 +62,7 @@ class Dispatcher(Generic[WT]):
             `overload_numpy.wrapper.ufunc.ImplementsUFunc`,
             `overload_numpy.wrapper.ufunc.AssistsUFunc`, depending on the type
             parameterization of this generic class.
+
         """
         return self._dspr(obj)
 
@@ -79,6 +79,7 @@ class Dispatcher(Generic[WT]):
             `overload_numpy.wrapper.ufunc.ImplementsUFunc`,
             `overload_numpy.wrapper.ufunc.AssistsUFunc`, depending on the type
             parameterization of this generic class.
+
         """
         self._dspr.register(cls, DispatchWrapper(func))
 
@@ -95,6 +96,7 @@ class DispatchWrapper(Generic[WT]):
     ----------
     __wrapped__ : `ImplementsFunc` or `AssistsFunc` or `ImplementsUFunc` or `AssistsUFunc`
         The result of calling ``Dispatch``.
+
     """
 
     __wrapped__: WT  # Dispatch wrapper

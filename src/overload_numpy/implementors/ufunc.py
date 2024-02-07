@@ -1,6 +1,5 @@
 """Implementations for |ufunc| overrides."""
 
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -61,6 +60,7 @@ class OverrideUFuncBase:
     dispatch_on : type, keyword-only
         The type dispatched on. See
         `~overload_numpy.wrapper.dispatch.Dispatcher`.
+
     """
 
     _funcs: UFuncMethodOverloadMap
@@ -95,6 +95,7 @@ class OverrideUFuncBase:
         -------
         bool
             If the ``method`` is in the attr ``funcs``.
+
         """
         return method in self._funcs
 
@@ -158,6 +159,7 @@ class OverrideUFuncBase:
         Notes
         -----
         This is a decorator factory.
+
         """
         # TODO: validation that the function has the right signature.
         return RegisterUFuncMethodDecorator(self._funcs, _parse_methods(methods))
@@ -198,6 +200,7 @@ class RegisterUFuncMethodDecorator:
         -------
         func : Callable[..., Any]
             Unchanged.
+
         """
         # Iterate through the methods, adding as overloads for specified
         # methods.
@@ -221,6 +224,7 @@ class OverloadUFuncDecorator(Generic[UT]):
         Set of names of |ufunc| methods.
     overloader : |NumPyOverloader|, keyword-only
         Overloader instance.
+
     """
 
     override_cls: type[UT]
@@ -249,6 +253,7 @@ class OverloadUFuncDecorator(Generic[UT]):
         ``UT``
             `overload_numpy.wrapper.ufunc.ImplementsUFunc` or
             `overload_numpy.wrapper.ufunc.AssistsUFunc`.
+
         """
         methods = UFuncMethodOverloadMap(__call__=func)
         for m in self.methods - {"__call__"}:
@@ -293,6 +298,7 @@ class ImplementsUFunc(OverrideUFuncBase):
     Methods
     -------
     register
+
     """
 
     def __call__(
@@ -322,6 +328,7 @@ class ImplementsUFunc(OverrideUFuncBase):
         -------
         object
             The result of evaluating the |ufunc| method.
+
         """
         if not self.validate_method(method):
             return NotImplemented
@@ -347,6 +354,7 @@ class AssistsUFunc(OverrideUFuncBase):
     dispatch_on : type, keyword-only
         The type dispatched on. See
         `~overload_numpy.wrapper.dispatch.Dispatcher`.
+
     """
 
     # TODO: parametrize return type?
@@ -370,6 +378,7 @@ class AssistsUFunc(OverrideUFuncBase):
         -------
         object
             The result of evaluating the |ufunc| method.
+
         """
         if not self.validate_method(method):
             return NotImplemented
