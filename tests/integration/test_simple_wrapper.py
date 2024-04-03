@@ -82,7 +82,7 @@ def add_reduceat(w, indices, axis=0, dtype=None, out=None):
 # ---------------------------------------------------------
 # Assists a function
 
-stack_funcs = {np.vstack, np.hstack, np.dstack, np.column_stack, np.row_stack}
+stack_funcs = {np.vstack, np.hstack, np.dstack, np.column_stack, np.vstack}
 
 
 @NP_OVERLOADS.assists(stack_funcs, types=Wrap1, dispatch_on=Wrap1)
