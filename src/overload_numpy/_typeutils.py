@@ -51,6 +51,6 @@ class UFuncLike(Protocol):
         """|ufunc| ``reduce`` method."""
         ...
 
-    def reduceat(self, array: Any, indices: Any, axis: Any, dtype: Any, out: Any) -> Any:  # noqa: PLR0913
+    def reduceat(self, array: Any, indices: Any, axis: Any, dtype: Any, out: Any) -> Any:
         """|ufunc| ``reduceat`` method."""
         ...

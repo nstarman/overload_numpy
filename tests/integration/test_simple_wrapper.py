@@ -7,6 +7,7 @@ from typing import ClassVar
 
 import numpy as np
 import pytest
+
 from overload_numpy import NPArrayOverloadMixin, NumPyOverloader
 from overload_numpy.constraints import Covariant
 
@@ -135,37 +136,37 @@ def mul_reduceat_assists(cls, func, /, w1, indices, axis=0, dtype=None, out=None
 # FIXTURES
 
 
-@pytest.fixture()
+@pytest.fixture
 def overloader() -> NumPyOverloader:
     return NP_OVERLOADS
 
 
-@pytest.fixture()
+@pytest.fixture
 def array() -> np.ndarray:
     return np.arange(1, 11, dtype=float)  # to avoid dividing by 0
 
 
-@pytest.fixture()
+@pytest.fixture
 def array2() -> np.ndarray:
     return np.arange(11, 21, dtype=float)
 
 
-@pytest.fixture()
+@pytest.fixture
 def w1(array: np.ndarray) -> Wrap1:
     return Wrap1(array)
 
 
-@pytest.fixture()
+@pytest.fixture
 def w1b(array: np.ndarray) -> Wrap1:
     return Wrap1(array)
 
 
-@pytest.fixture()
+@pytest.fixture
 def w2(array: np.ndarray, array2: np.ndarray) -> Wrap2:
     return Wrap2(array, array2)
 
 
-@pytest.fixture()
+@pytest.fixture
 def w2b(array: np.ndarray, array2: np.ndarray) -> Wrap2:
     return Wrap2(array, array2)
 

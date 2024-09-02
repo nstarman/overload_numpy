@@ -5,6 +5,7 @@ from typing import ClassVar, FrozenSet, Optional, Union
 
 import numpy as np
 import pytest
+
 from overload_numpy import NumPyOverloader
 from overload_numpy.constraints import TypeConstraint
 from overload_numpy.mixin import (
