@@ -5,6 +5,7 @@ from itertools import permutations
 
 import numpy as np
 import pytest
+
 from overload_numpy.utils import UFMT, VALID_UFUNC_METHODS, _get_key, _parse_methods
 
 ##############################################################################

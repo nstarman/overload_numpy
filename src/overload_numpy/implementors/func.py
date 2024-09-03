@@ -97,7 +97,7 @@ class OverloadFuncDecorator(Generic[FT]):
     _override_cls: Final[type[ImplementsFunc | AssistsFunc]]
 
     # TODO: rm when https://github.com/python/mypy/issues/13304 fixed
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         override_cls: type[ImplementsFunc | AssistsFunc],
         *,

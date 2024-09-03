@@ -1,6 +1,7 @@
 """Unit tests for :mod:`overload_numpy.overload`."""
 
 import pytest
+
 from overload_numpy.overload import NumPyOverloader
 
 ##############################################################################
@@ -11,7 +12,7 @@ from overload_numpy.overload import NumPyOverloader
 class Test_NumPyOverloader:
     """Test :class:`overload_numpy.NumPyOverloader`."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def overloader(self) -> NumPyOverloader:
         overloader = NumPyOverloader()
 
@@ -64,6 +65,6 @@ class Test_NumPyOverloader:
     # ===============================================================
     # Usage tests
 
-    @pytest.mark.incompatible_with_mypyc()
+    @pytest.mark.incompatible_with_mypyc
     def test_serialization(self, overloader):
         pass

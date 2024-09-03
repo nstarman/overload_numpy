@@ -1,4 +1,5 @@
 import pytest
+
 from overload_numpy.implementors.dispatch import DispatchWrapper
 from overload_numpy.implementors.ufunc import OverloadUFuncDecorator
 

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from overload_numpy import NumPyOverloader
 from overload_numpy.implementors.dispatch import Dispatcher
 from overload_numpy.utils import _get_key
